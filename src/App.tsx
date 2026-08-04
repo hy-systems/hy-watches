@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import { ChevronDown, Search, Globe, ShoppingBag, Menu, ChevronLeft, ChevronRight, Star, Play, Package, CreditCard, ShieldCheck, X, Instagram, Facebook } from 'lucide-react'
 
 const popularCollections = [
@@ -71,7 +71,7 @@ export default function App() {
         .nav-link:hover::after { transform: translateX(0); }
         
         .btn-premium { position: relative; border: 1px solid rgba(255,255,255,0.3); padding: 12px 32px; letter-spacing: 3px; font-family: 'Roboto Condensed'; text-transform: uppercase; overflow: hidden; color: white; transition: all 0.4s ease; background: transparent; backdrop-filter: blur(5px); }
-        .btn-premium::before { content: ''; position: absolute; top: 0; left: -100%; w: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 0.7s ease; }
+        .btn-premium::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 0.7s ease; }
         .btn-premium:hover { border-color: #dbaf56; color: #dbaf56; box-shadow: 0 0 20px rgba(219, 175, 86, 0.15); }
         .btn-premium:hover::before { left: 100%; }
 
@@ -187,7 +187,7 @@ export default function App() {
         
         <div className="relative w-full h-screen bg-black overflow-hidden flex items-center justify-center">
           <video className="absolute inset-0 w-full h-full object-cover opacity-60 slow-zoom pointer-events-none" preload="auto" playsInline autoPlay muted loop>
-            <source src="https://lucytimepieces.com/wp-content/uploads/2025/06/lucytimepieces-com-1.mp4" type="video/mp4" />
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-luxury-watch-on-a-dark-background-4240-large.mp4" type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/90 pointer-events-none"></div>
           
@@ -235,7 +235,7 @@ export default function App() {
         <section className="relative w-full py-24 bg-[#0a0a0a] border-t border-white/5 overflow-hidden">
           <div className="max-w-[1400px] mx-auto px-6 mb-16 flex flex-col items-center reveal-on-scroll">
             <h3 className="font-serif uppercase text-3xl md:text-4xl text-white font-bold flex items-center tracking-[3px]">
-              <span className="text-[#dbaf56] mr-4">—</span> POPULAR COLLECTIONS <span className="text-[#dbaf56] ml-4">—</span>
+              <span className="text-[#dbaf56] mr-4">-</span> POPULAR COLLECTIONS <span className="text-[#dbaf56] ml-4">-</span>
             </h3>
           </div>
           
@@ -281,7 +281,7 @@ export default function App() {
           
           <div className="max-w-[1400px] mx-auto px-6 mb-16 flex flex-col items-center reveal-on-scroll">
             <h3 className="font-serif uppercase text-3xl md:text-4xl text-white font-bold flex items-center tracking-[3px]">
-              <span className="text-[#dbaf56] mr-4">—</span> YOU MIGHT ALSO LIKE <span className="text-[#dbaf56] ml-4">—</span>
+              <span className="text-[#dbaf56] mr-4">-</span> YOU MIGHT ALSO LIKE <span className="text-[#dbaf56] ml-4">-</span>
             </h3>
           </div>
           
@@ -308,7 +308,7 @@ export default function App() {
         <section className="relative w-full py-24 bg-[#0a0a0a] border-t border-white/5">
           <div className="max-w-[1400px] mx-auto px-6 mb-16 flex flex-col items-center reveal-on-scroll">
             <h3 className="font-serif uppercase text-3xl md:text-4xl text-white font-bold flex items-center tracking-[3px]">
-              <span className="text-[#dbaf56] mr-4">—</span> HANDCRAFTED CNC <span className="text-[#dbaf56] ml-4">—</span>
+              <span className="text-[#dbaf56] mr-4">-</span> HANDCRAFTED CNC <span className="text-[#dbaf56] ml-4">-</span>
             </h3>
           </div>
 
@@ -342,7 +342,7 @@ export default function App() {
               
               <div className="flex flex-col justify-center reveal-on-scroll pr-8">
                 <h3 className="font-serif uppercase text-3xl text-white font-bold flex items-center mb-8 tracking-[3px]">
-                  <span className="text-[#dbaf56] mr-4">—</span> HY ON SOCIAL
+                  <span className="text-[#dbaf56] mr-4">-</span> HY ON SOCIAL
                 </h3>
                 <p className="font-sans text-gray-400 leading-[1.8] mb-6 text-[15px] font-light">
                   Follow <strong className="text-white font-medium">HY Watches</strong> on TikTok, Instagram and Facebook for real unboxing videos, detailed product reviews, new arrivals updates and watch insights.

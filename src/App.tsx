@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { ChevronDown, Search, Globe, ShoppingBag, Menu, ChevronLeft, ChevronRight, Star, Play, Package, CreditCard, ShieldCheck, X, Instagram, Facebook } from 'lucide-react'
 
 const popularCollections = [
@@ -35,288 +35,340 @@ export default function App() {
   const [activeCollectionSlide, setActiveCollectionSlide] = useState(0)
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY >= 80)
+    const handleScroll = () => setIsScrolled(window.scrollY >= 50)
     window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-revealed')
+        }
+      })
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' })
+    
+    document.querySelectorAll('.reveal-on-scroll').forEach((el) => observer.observe(el))
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      observer.disconnect()
+    }
   }, [])
 
   const nextCollectionSlide = () => setActiveCollectionSlide((prev) => (prev + 1) % popularCollections.length)
   const prevCollectionSlide = () => setActiveCollectionSlide((prev) => (prev - 1 + popularCollections.length) % popularCollections.length)
 
   return (
-    <div className="w-full min-h-screen bg-black text-white font-sans selection:bg-[#dbaf56] selection:text-white flex flex-col">
+    <div className="w-full min-h-screen bg-[#050505] text-white font-sans selection:bg-[#dbaf56] selection:text-white flex flex-col overflow-x-hidden">
       
-      {/* FLOATING ACTION BUTTONS */}
-      <div className="fixed right-4 bottom-6 z-[99] flex flex-col gap-3">
-        <a href="#" className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-transform duration-300 hover:scale-110 bg-[#262626] border border-white/20 text-white hover:bg-[#dbaf56] hover:border-[#dbaf56]">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+      <style dangerouslySetInnerHTML={{__html: `
+        :root { --accent: #dbaf56; }
+        body { font-family: 'Sarabun', sans-serif; background-color: #050505; color: #ffffff; margin: 0; padding: 0; }
+        h1, h2, h3, h4, h5, h6, .font-serif { font-family: 'Roboto Condensed', sans-serif; }
+        .font-mono { font-family: 'Lexend', sans-serif; }
+        
+        .nav-link { position: relative; letter-spacing: 2px; font-size: 12px; font-weight: 500; overflow: hidden; }
+        .nav-link::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 100%; height: 1px; background-color: #dbaf56; transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .nav-link:hover::after { transform: translateX(0); }
+        
+        .btn-premium { position: relative; border: 1px solid rgba(255,255,255,0.3); padding: 12px 32px; letter-spacing: 3px; font-family: 'Roboto Condensed'; text-transform: uppercase; overflow: hidden; color: white; transition: all 0.4s ease; background: transparent; backdrop-filter: blur(5px); }
+        .btn-premium::before { content: ''; position: absolute; top: 0; left: -100%; w: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 0.7s ease; }
+        .btn-premium:hover { border-color: #dbaf56; color: #dbaf56; box-shadow: 0 0 20px rgba(219, 175, 86, 0.15); }
+        .btn-premium:hover::before { left: 100%; }
+
+        .reveal-on-scroll { opacity: 0; transform: translateY(40px); transition: all 1s cubic-bezier(0.16, 1, 0.3, 1); }
+        .is-revealed { opacity: 1; transform: translateY(0); }
+        
+        .stagger-1 { transition-delay: 100ms; }
+        .stagger-2 { transition-delay: 200ms; }
+        .stagger-3 { transition-delay: 300ms; }
+
+        .slow-zoom { animation: slowZoom 20s infinite alternate linear; }
+        @keyframes slowZoom { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
+
+        .ambient-glow { position: absolute; width: 300px; height: 300px; background: radial-gradient(circle, rgba(219,175,86,0.08) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 0; mix-blend-mode: screen; }
+
+        .card-shimmer { position: relative; }
+        .card-shimmer::after { content: ''; position: absolute; inset: 0; background: linear-gradient(120deg, transparent, rgba(255,255,255,0.03), transparent); transform: translateX(-100%); transition: transform 0.8s ease; }
+        .card-shimmer:hover::after { transform: translateX(100%); }
+      `}} />
+
+      <div className="fixed right-4 bottom-6 z-[99] flex flex-col gap-4">
+        <a href="#" className="w-12 h-12 rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-all duration-500 hover:scale-110 bg-[#111] border border-white/10 text-white hover:bg-[#dbaf56] hover:border-[#dbaf56] hover:text-black group">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transition-transform group-hover:rotate-12"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
         </a>
-        <a href="#" className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-transform duration-300 hover:scale-110 bg-[#262626] border border-white/20 text-white hover:bg-[#dbaf56] hover:border-[#dbaf56]">
-          <Instagram size={20} />
+        <a href="#" className="w-12 h-12 rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-all duration-500 hover:scale-110 bg-[#111] border border-white/10 text-white hover:bg-[#dbaf56] hover:border-[#dbaf56] hover:text-black group">
+          <Instagram size={20} className="transition-transform group-hover:scale-110" />
         </a>
       </div>
 
-      {/* HEADER */}
-      <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'h-[70px] bg-black/90 backdrop-blur-md shadow-lg border-b border-white/10' : 'h-[90px] bg-gradient-to-b from-black/80 to-transparent'}`}>
-        <div className="max-w-[1200px] mx-auto w-full h-full px-6 flex justify-between items-center">
+      <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${isScrolled ? 'h-[75px] bg-black/80 backdrop-blur-xl shadow-[0_4px_30px_rgba(0,0,0,0.8)] border-b border-white/5' : 'h-[100px] bg-gradient-to-b from-black/90 via-black/40 to-transparent'}`}>
+        <div className="max-w-[1400px] mx-auto w-full h-full px-8 flex justify-between items-center">
           
-          <div className="flex-shrink-0 w-[200px]">
-            <a href="#" className="font-serif uppercase tracking-[3px] text-2xl font-bold text-white hover:text-[#dbaf56] transition-colors duration-300">
+          <div className="flex-shrink-0 w-[200px] z-50">
+            <a href="#" className="font-serif uppercase tracking-[4px] text-2xl font-bold text-white hover:text-[#dbaf56] transition-all duration-500 hover:tracking-[6px]">
               HY WATCHES
             </a>
           </div>
 
           <nav className="hidden md:flex flex-grow justify-center h-full">
-            <ul className="flex space-x-8 items-center h-full m-0 p-0">
+            <ul className="flex space-x-10 items-center h-full m-0 p-0">
               <li className="relative group h-full flex items-center">
-                <a href="#" className="text-[13px] font-bold tracking-[2px] uppercase text-white hover:text-[#dbaf56] transition-colors">
-                  SHOP
-                </a>
+                <a href="#" className="flex items-center nav-link text-white">SHOP</a>
               </li>
               <li className="relative group h-full flex items-center">
-                <a href="#" className="flex items-center text-[13px] font-bold tracking-[2px] uppercase text-white hover:text-[#dbaf56] transition-colors">
-                  BRANDS <ChevronDown size={12} className="ml-1" />
+                <a href="#" className="flex items-center nav-link text-white">
+                  BRANDS <ChevronDown size={12} className="ml-1 opacity-50 group-hover:opacity-100 transition-opacity" />
                 </a>
-                <div className="absolute top-[100%] left-0 bg-[#111111] border border-white/10 shadow-2xl min-w-[220px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2 z-50">
+                <div className="absolute top-[100%] left-1/2 -translate-x-1/2 bg-black/95 backdrop-blur-xl border border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.8)] min-w-[240px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 py-4 z-50 translate-y-4 group-hover:translate-y-0">
                   {['Rolex', 'Tudor', 'Hublot', 'Omega', 'Cartier', 'Patek Philippe', 'Audemars Piguet', 'Vacheron Constantin', 'Richard Mille', 'Jaeger Lecoultre', 'Franck Muller', 'IWC'].map((brand) => (
-                    <a key={brand} href="#" className="block px-6 py-2.5 text-sm text-gray-300 hover:bg-white hover:text-black transition-colors">{brand}</a>
+                    <a key={brand} href="#" className="block px-8 py-3 text-[13px] tracking-[1px] font-serif uppercase text-gray-400 hover:bg-white/5 hover:text-[#dbaf56] transition-colors">{brand}</a>
                   ))}
                 </div>
               </li>
               <li className="relative group h-full flex items-center">
-                <a href="#" className="flex items-center text-[13px] font-bold tracking-[2px] uppercase text-white hover:text-[#dbaf56] transition-colors">
-                  COLLECTIONS <ChevronDown size={12} className="ml-1" />
+                <a href="#" className="flex items-center nav-link text-white">
+                  COLLECTIONS <ChevronDown size={12} className="ml-1 opacity-50 group-hover:opacity-100 transition-opacity" />
                 </a>
-                <div className="absolute top-[100%] left-0 bg-[#111111] border border-white/10 shadow-2xl min-w-[220px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2 z-50">
+                <div className="absolute top-[100%] left-1/2 -translate-x-1/2 bg-black/95 backdrop-blur-xl border border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.8)] min-w-[240px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 py-4 z-50 translate-y-4 group-hover:translate-y-0">
                   {['HY PICKS', 'CUSTOMIZE PRODUCTS', 'CUSTOMIZE DIAMOND', 'MEN\'S', 'WOMEN\'S'].map((col) => (
-                    <a key={col} href="#" className="block px-6 py-2.5 text-sm text-gray-300 hover:bg-white hover:text-black transition-colors">{col}</a>
+                    <a key={col} href="#" className="block px-8 py-3 text-[13px] tracking-[1px] font-serif uppercase text-gray-400 hover:bg-white/5 hover:text-[#dbaf56] transition-colors">{col}</a>
                   ))}
                 </div>
               </li>
               <li className="relative group h-full flex items-center">
-                <a href="#" className="text-[13px] font-bold tracking-[2px] uppercase text-white hover:text-[#dbaf56] transition-colors">
-                  HOW TO ORDER
-                </a>
+                <a href="#" className="flex items-center nav-link text-white">HOW TO ORDER</a>
               </li>
               <li className="relative group h-full flex items-center">
-                <a href="#" className="flex items-center text-[13px] font-bold tracking-[2px] uppercase text-white hover:text-[#dbaf56] transition-colors">
-                  ABOUTS <ChevronDown size={12} className="ml-1" />
+                <a href="#" className="flex items-center nav-link text-white">
+                  ABOUTS <ChevronDown size={12} className="ml-1 opacity-50 group-hover:opacity-100 transition-opacity" />
                 </a>
-                <div className="absolute top-[100%] left-0 bg-[#111111] border border-white/10 shadow-2xl min-w-[220px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2 z-50">
-                  <a href="#" className="block px-6 py-2.5 text-sm text-gray-300 hover:bg-white hover:text-black transition-colors">INFO US</a>
-                  <a href="#" className="block px-6 py-2.5 text-sm text-gray-300 hover:bg-white hover:text-black transition-colors">CONTACT</a>
-                  <a href="#" className="block px-6 py-2.5 text-sm text-gray-300 hover:bg-white hover:text-black transition-colors">SOCIAL MEDIA</a>
+                <div className="absolute top-[100%] left-1/2 -translate-x-1/2 bg-black/95 backdrop-blur-xl border border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.8)] min-w-[240px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 py-4 z-50 translate-y-4 group-hover:translate-y-0">
+                  {['INFO US', 'CONTACT', 'SOCIAL MEDIA'].map((item) => (
+                    <a key={item} href="#" className="block px-8 py-3 text-[13px] tracking-[1px] font-serif uppercase text-gray-400 hover:bg-white/5 hover:text-[#dbaf56] transition-colors">{item}</a>
+                  ))}
                 </div>
               </li>
             </ul>
           </nav>
 
-          <div className="flex items-center space-x-5 flex-shrink-0">
-            <Search size={18} className="cursor-pointer text-white hover:text-[#dbaf56] transition-colors" />
-            <Globe size={18} className="cursor-pointer text-white hover:text-[#dbaf56] transition-colors" />
-            <ShoppingBag size={18} className="cursor-pointer text-white hover:text-[#dbaf56] transition-colors" />
+          <div className="flex items-center space-x-6 flex-shrink-0 z-50">
+            <Search size={18} className="cursor-pointer text-white/80 hover:text-[#dbaf56] transition-colors duration-300 hover:scale-110 transform" />
+            <Globe size={18} className="cursor-pointer text-white/80 hover:text-[#dbaf56] transition-colors duration-300 hover:scale-110 transform" />
+            <ShoppingBag size={18} className="cursor-pointer text-white/80 hover:text-[#dbaf56] transition-colors duration-300 hover:scale-110 transform" />
             <Menu size={24} className="cursor-pointer md:hidden text-white hover:text-[#dbaf56] transition-colors" onClick={() => setIsMobileMenuOpen(true)} />
           </div>
         </div>
       </header>
 
-      {/* MOBILE MENU OVERLAY */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-[100] flex">
-          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity" onClick={() => setIsMobileMenuOpen(false)}></div>
-          <div className="relative w-[80%] max-w-[320px] h-full bg-[#111111] border-l border-white/10 shadow-2xl flex flex-col z-[101] ml-auto transform transition-transform duration-300">
-            <div className="flex justify-between items-center p-6 border-b border-white/10">
-              <span className="font-serif uppercase tracking-[2px] font-bold text-lg text-white">MENU</span>
-              <X size={24} className="cursor-pointer text-gray-400 hover:text-[#dbaf56] transition-colors" onClick={() => setIsMobileMenuOpen(false)} />
+          <div className="absolute inset-0 bg-black/90 backdrop-blur-xl transition-opacity duration-500" onClick={() => setIsMobileMenuOpen(false)}></div>
+          <div className="relative w-[85%] max-w-[360px] h-full bg-[#050505] border-l border-white/10 shadow-2xl flex flex-col z-[101] ml-auto transform transition-transform duration-500 ease-out">
+            <div className="flex justify-between items-center p-8 border-b border-white/10">
+              <span className="font-serif uppercase tracking-[3px] font-bold text-xl text-white">MENU</span>
+              <X size={28} className="cursor-pointer text-gray-400 hover:text-[#dbaf56] transition-colors hover:rotate-90 transform duration-300" onClick={() => setIsMobileMenuOpen(false)} />
             </div>
-            <div className="flex flex-col py-4 overflow-y-auto">
-              <div className="px-6 pb-4 mb-4 border-b border-white/10">
-                <div className="relative">
-                  <input type="text" placeholder="Search..." className="w-full border border-white/20 bg-black h-12 px-4 text-sm text-white focus:outline-none focus:border-[#dbaf56] rounded-sm transition-colors" />
-                  <Search size={18} className="absolute right-4 top-3.5 text-gray-400" />
+            <div className="flex flex-col py-6 overflow-y-auto">
+              <div className="px-8 pb-6 mb-4 border-b border-white/10">
+                <div className="relative group">
+                  <input type="text" placeholder="Search..." className="w-full border-b border-white/20 bg-transparent h-12 text-sm text-white focus:outline-none focus:border-[#dbaf56] transition-colors" />
+                  <Search size={18} className="absolute right-0 top-3.5 text-gray-500 group-hover:text-[#dbaf56] transition-colors" />
                 </div>
               </div>
-              <a href="#" className="px-6 py-4 font-serif uppercase text-sm tracking-[1.5px] font-medium text-gray-300 hover:text-[#dbaf56] hover:bg-white/5 transition-colors border-b border-white/5">SHOP</a>
-              <a href="#" className="px-6 py-4 font-serif uppercase text-sm tracking-[1.5px] font-medium text-gray-300 hover:text-[#dbaf56] hover:bg-white/5 transition-colors border-b border-white/5">BRANDS</a>
-              <a href="#" className="px-6 py-4 font-serif uppercase text-sm tracking-[1.5px] font-medium text-gray-300 hover:text-[#dbaf56] hover:bg-white/5 transition-colors border-b border-white/5">COLLECTIONS</a>
-              <a href="#" className="px-6 py-4 font-serif uppercase text-sm tracking-[1.5px] font-medium text-gray-300 hover:text-[#dbaf56] hover:bg-white/5 transition-colors border-b border-white/5">HOW TO ORDER</a>
-              <a href="#" className="px-6 py-4 font-serif uppercase text-sm tracking-[1.5px] font-medium text-gray-300 hover:text-[#dbaf56] hover:bg-white/5 transition-colors">ABOUTS</a>
+              {['SHOP', 'BRANDS', 'COLLECTIONS', 'HOW TO ORDER', 'ABOUTS'].map((item) => (
+                <a key={item} href="#" className="px-8 py-5 font-serif uppercase text-sm tracking-[2px] font-medium text-gray-300 hover:text-[#dbaf56] hover:pl-10 transition-all duration-300 border-b border-white/5">{item}</a>
+              ))}
             </div>
           </div>
         </div>
       )}
 
-      {/* MAIN CONTENT AREA */}
-      <main className="flex-grow w-full">
+      <main className="flex-grow w-full pt-0">
         
-        {/* HERO BANNER */}
         <div className="relative w-full h-screen bg-black overflow-hidden flex items-center justify-center">
-          <video className="absolute inset-0 w-full h-full object-cover opacity-60 pointer-events-none" preload="auto" playsInline autoPlay muted loop>
+          <video className="absolute inset-0 w-full h-full object-cover opacity-60 slow-zoom pointer-events-none" preload="auto" playsInline autoPlay muted loop>
             <source src="https://lucytimepieces.com/wp-content/uploads/2025/06/lucytimepieces-com-1.mp4" type="video/mp4" />
           </video>
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/60 pointer-events-none"></div>
-          <div className="relative z-10 text-center px-6 max-w-[800px] flex flex-col items-center">
-            <span className="text-[12px] md:text-[14px] tracking-[4px] uppercase text-gray-300 mb-4 font-serif block">POPULAR COLLECTIONS</span>
-            <h1 className="text-5xl md:text-8xl font-bold uppercase text-white font-serif drop-shadow-2xl leading-none tracking-wide mb-6">SERIES ALPHA</h1>
-            <a href="#" className="border-2 border-white px-8 py-3 text-sm font-serif uppercase tracking-[2px] hover:bg-white hover:text-black transition-all duration-300">EXPLORE NOW</a>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/90 pointer-events-none"></div>
+          
+          <div className="relative z-10 text-center px-6 max-w-[900px] flex flex-col items-center">
+            <span className="text-[11px] md:text-[13px] tracking-[6px] uppercase text-[#dbaf56] mb-6 font-serif block opacity-0 animate-[fadeIn_2s_ease-out_ forwards]">POPULAR COLLECTIONS</span>
+            <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold uppercase text-white font-serif drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] leading-[0.9] tracking-tight mb-10 opacity-0 animate-[fadeInUp_1.5s_ease-out_0.5s_forwards]">SERIES ALPHA</h1>
+            <div className="opacity-0 animate-[fadeInUp_1.5s_ease-out_1s_forwards]">
+              <a href="#" className="btn-premium inline-flex items-center group">
+                <span className="relative z-10 font-bold">EXPLORE NOW</span>
+                <ChevronRight size={16} className="ml-3 relative z-10 transform group-hover:translate-x-1 transition-transform" />
+              </a>
+            </div>
           </div>
+
+          <style dangerouslySetInnerHTML={{__html: `
+            @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+            @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+          `}} />
         </div>
 
-        {/* ANNOUNCEMENT BAR */}
-        <div className="relative w-full bg-[#111111] py-4 border-t border-b border-white/10 z-20">
-          <p className="text-center text-gray-300 text-[11px] md:text-[13px] tracking-[3px] uppercase font-sans m-0">
+        <div className="relative w-full bg-[#0a0a0a] py-5 border-b border-white/10 z-20 shadow-[0_10px_30px_rgba(0,0,0,1)]">
+          <p className="text-center text-gray-400 text-[10px] md:text-[12px] tracking-[4px] uppercase font-sans m-0 flex items-center justify-center">
+            <span className="w-8 h-[1px] bg-[#dbaf56]/50 mr-4 hidden md:block"></span>
             Complimentary Travel Case with Every Watch Purchase
+            <span className="w-8 h-[1px] bg-[#dbaf56]/50 ml-4 hidden md:block"></span>
           </p>
         </div>
 
-        {/* WELCOME SECTION */}
-        <div className="w-full py-20 md:py-28 px-6 bg-black border-b border-white/10 flex justify-center">
-          <div className="max-w-[800px] text-center flex flex-col items-center">
-            <h2 className="uppercase font-serif text-3xl md:text-5xl mb-6 tracking-[2px] font-bold text-white">
-              Welcome to HY WATCHES
+        <div className="relative w-full py-24 md:py-36 px-6 bg-[#050505] overflow-hidden flex justify-center">
+          <div className="ambient-glow top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px]"></div>
+          <div className="max-w-[800px] text-center flex flex-col items-center relative z-10 reveal-on-scroll">
+            <h2 className="uppercase font-serif text-4xl md:text-6xl mb-8 tracking-[3px] font-bold text-white leading-tight">
+              Welcome to<br/>HY WATCHES
             </h2>
-            <p className="font-sans text-gray-400 text-lg md:text-xl mb-2 leading-relaxed">
+            <div className="w-16 h-[2px] bg-[#dbaf56] mb-8"></div>
+            <p className="font-sans text-gray-400 text-lg md:text-xl mb-3 leading-relaxed tracking-wide font-light">
               Providing perfectly customized products.
             </p>
-            <p className="font-sans text-gray-400 text-lg md:text-xl leading-relaxed">
+            <p className="font-sans text-gray-400 text-lg md:text-xl leading-relaxed tracking-wide font-light">
               We also buy and appraise genuine watches and luxury items.
             </p>
           </div>
         </div>
 
-        {/* POPULAR COLLECTIONS SLIDER */}
-        <section className="w-full py-20 bg-[#0a0a0a]">
-          <div className="max-w-[1200px] mx-auto px-6 mb-12 flex flex-col items-center">
-            <h3 className="font-serif uppercase text-2xl md:text-3xl text-white font-bold flex items-center tracking-[2px]">
-              <Menu className="mr-3 text-[#dbaf56]" size={28} /> POPULAR COLLECTIONS
+        <section className="relative w-full py-24 bg-[#0a0a0a] border-t border-white/5 overflow-hidden">
+          <div className="max-w-[1400px] mx-auto px-6 mb-16 flex flex-col items-center reveal-on-scroll">
+            <h3 className="font-serif uppercase text-3xl md:text-4xl text-white font-bold flex items-center tracking-[3px]">
+              <span className="text-[#dbaf56] mr-4">—</span> POPULAR COLLECTIONS <span className="text-[#dbaf56] ml-4">—</span>
             </h3>
           </div>
           
-          <div className="relative max-w-[1400px] mx-auto px-12 md:px-20">
-            <div className="flex overflow-hidden gap-6 h-[400px] md:h-[550px]">
+          <div className="relative max-w-[1600px] mx-auto px-12 md:px-24 reveal-on-scroll stagger-1">
+            <div className="flex overflow-hidden gap-8 h-[450px] md:h-[650px]">
               {popularCollections.map((item, index) => {
                 let displayClass = 'hidden'
                 if (index === activeCollectionSlide || index === (activeCollectionSlide + 1) % popularCollections.length || index === (activeCollectionSlide + 2) % popularCollections.length) {
                   displayClass = 'flex'
                 }
                 return (
-                  <div key={item.id} className={`${displayClass} w-full md:w-1/3 relative group cursor-pointer overflow-hidden border border-white/10 bg-[#111111]`}>
-                    <img src={item.img} alt={item.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 opacity-70 group-hover:opacity-90" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90 transition-opacity"></div>
-                    <div className="absolute bottom-10 left-0 w-full text-center z-10 px-6">
-                      <p className="text-[#dbaf56] text-xs md:text-sm tracking-[3px] uppercase mb-2 font-serif font-medium">{item.subtitle}</p>
-                      <h4 className="text-white text-xl md:text-3xl font-bold uppercase tracking-[1px] font-serif">{item.title}</h4>
+                  <div key={item.id} className={`${displayClass} w-full md:w-1/3 relative group cursor-pointer overflow-hidden bg-[#111111] card-shimmer`}>
+                    <img src={item.img} alt={item.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-[1.15] opacity-60 group-hover:opacity-90 grayscale-[20%] group-hover:grayscale-0" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-black/40 to-transparent opacity-90 transition-opacity duration-700"></div>
+                    <div className="absolute bottom-0 left-0 w-full text-center z-10 px-6 py-12 transform transition-transform duration-500 translate-y-4 group-hover:translate-y-0">
+                      <p className="text-[#dbaf56] text-[10px] md:text-xs tracking-[4px] uppercase mb-3 font-serif font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">{item.subtitle}</p>
+                      <h4 className="text-white text-2xl md:text-4xl font-bold uppercase tracking-[2px] font-serif">{item.title}</h4>
+                      <div className="w-0 h-[1px] bg-white mx-auto mt-6 transition-all duration-500 group-hover:w-12"></div>
                     </div>
                   </div>
                 )
               })}
             </div>
             
-            <button onClick={prevCollectionSlide} className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 w-12 h-12 bg-black border-2 border-white/20 text-white rounded-full flex items-center justify-center hover:bg-white hover:text-black hover:border-white transition-all z-20">
-              <ChevronLeft size={24} />
+            <button onClick={prevCollectionSlide} className="absolute left-4 md:left-10 top-1/2 -translate-y-1/2 w-14 h-14 bg-black/50 backdrop-blur-md border border-white/20 text-white rounded-full flex items-center justify-center hover:bg-[#dbaf56] hover:text-black hover:border-[#dbaf56] transition-all duration-300 z-20 hover:scale-110">
+              <ChevronLeft size={24} strokeWidth={1.5} />
             </button>
-            <button onClick={nextCollectionSlide} className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 w-12 h-12 bg-black border-2 border-white/20 text-white rounded-full flex items-center justify-center hover:bg-white hover:text-black hover:border-white transition-all z-20">
-              <ChevronRight size={24} />
+            <button onClick={nextCollectionSlide} className="absolute right-4 md:right-10 top-1/2 -translate-y-1/2 w-14 h-14 bg-black/50 backdrop-blur-md border border-white/20 text-white rounded-full flex items-center justify-center hover:bg-[#dbaf56] hover:text-black hover:border-[#dbaf56] transition-all duration-300 z-20 hover:scale-110">
+              <ChevronRight size={24} strokeWidth={1.5} />
             </button>
           </div>
           
-          <div className="text-center mt-14">
-            <a href="#" className="border-2 border-white/40 px-8 py-3 text-sm font-serif uppercase tracking-[2px] text-white hover:bg-white hover:text-black hover:border-white transition-all inline-flex items-center">
-              SHOP ALL COLLECTION <ChevronRight size={16} className="ml-2" />
+          <div className="text-center mt-20 reveal-on-scroll stagger-2">
+            <a href="#" className="btn-premium inline-flex items-center group">
+              <span className="relative z-10 font-bold">SHOP ALL COLLECTION</span>
+              <ChevronRight size={16} className="ml-3 relative z-10 transform group-hover:translate-x-1 transition-transform" />
             </a>
           </div>
         </section>
 
-        {/* YOU MIGHT ALSO LIKE (PRODUCT GRID) */}
-        <section className="w-full py-20 bg-[#111111] border-t border-white/5">
-          <div className="max-w-[1200px] mx-auto px-6 mb-14 flex flex-col items-center">
-            <h3 className="font-serif uppercase text-2xl md:text-3xl text-white font-bold flex items-center tracking-[2px]">
-              <Menu className="mr-3 text-[#dbaf56]" size={28} /> YOU MIGHT ALSO LIKE
+        <section className="relative w-full py-24 bg-[#050505] border-t border-white/5 overflow-hidden">
+          <div className="ambient-glow top-0 right-0 w-[500px] h-[500px]"></div>
+          
+          <div className="max-w-[1400px] mx-auto px-6 mb-16 flex flex-col items-center reveal-on-scroll">
+            <h3 className="font-serif uppercase text-3xl md:text-4xl text-white font-bold flex items-center tracking-[3px]">
+              <span className="text-[#dbaf56] mr-4">—</span> YOU MIGHT ALSO LIKE <span className="text-[#dbaf56] ml-4">—</span>
             </h3>
           </div>
           
-          <div className="max-w-[1300px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 px-6">
-            {productGrid.map((product) => (
-              <div key={product.id} className="group cursor-pointer flex flex-col bg-[#1a1a1a] border border-white/10 p-4 md:p-5 shadow-2xl hover:-translate-y-2 transition-transform duration-300">
-                <div className="relative aspect-square overflow-hidden bg-[#222222] mb-5">
-                  <img src={product.img1} className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 opacity-90 group-hover:opacity-0" alt={product.title} />
-                  <img src={product.img2} className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 group-hover:opacity-90" alt={`${product.title} alt`} />
-                  <div className="absolute top-3 left-3 bg-[#dbaf56] text-black text-[10px] font-bold px-2 py-1 uppercase tracking-wider">HOT</div>
+          <div className="max-w-[1400px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10 px-6 relative z-10">
+            {productGrid.map((product, index) => (
+              <div key={product.id} className={`product-card group cursor-pointer flex flex-col bg-transparent border border-white/5 p-6 hover:bg-[#0a0a0a] hover:border-white/10 transition-all duration-500 reveal-on-scroll stagger-${(index % 4)} card-shimmer`}>
+                <div className="relative aspect-square overflow-hidden bg-transparent mb-6 mix-blend-screen">
+                  <img src={product.img1} className="default-img absolute inset-0 w-full h-full object-contain transition-opacity duration-700 opacity-80 group-hover:opacity-0 scale-95 group-hover:scale-100 ease-out" alt={product.title} />
+                  <img src={product.img2} className="hover-img absolute inset-0 w-full h-full object-contain opacity-0 transition-opacity duration-700 group-hover:opacity-100 scale-100 group-hover:scale-105 ease-out" alt={`${product.title} alt`} />
+                  <div className="absolute top-0 left-0 bg-[#dbaf56] text-black text-[9px] font-bold px-3 py-1.5 uppercase tracking-[2px] shadow-lg">HOT</div>
                 </div>
-                <h4 className="font-mono text-[13px] md:text-sm leading-relaxed text-center mt-2 text-gray-300 transition-colors duration-200 group-hover:text-white line-clamp-2 min-h-[40px] px-2">
+                <h4 className="font-mono text-[12px] md:text-[13px] leading-[1.8] text-center mt-2 text-gray-400 transition-colors duration-300 group-hover:text-white line-clamp-2 min-h-[46px] px-2 font-light">
                   {product.title}
                 </h4>
-                <div className="flex justify-center space-x-1 mt-4 mb-3">
-                  {[1, 2, 3, 4, 5].map((star) => <Star key={star} size={14} className="fill-[#dbaf56] text-[#dbaf56]" />)}
+                <div className="flex justify-center space-x-1.5 mt-5 mb-4">
+                  {[1, 2, 3, 4, 5].map((star) => <Star key={star} size={12} className="fill-[#dbaf56] text-[#dbaf56] opacity-80" />)}
                 </div>
-                <p className="font-serif text-lg md:text-xl font-bold text-center text-white mt-auto pt-2">${product.price}</p>
+                <p className="font-serif text-xl md:text-2xl font-bold text-center text-white mt-auto pt-2 tracking-wide">${product.price}</p>
               </div>
             ))}
           </div>
         </section>
 
-        {/* HANDCRAFTED CNC GALLERY */}
-        <section className="w-full py-20 bg-[#0a0a0a] border-t border-white/5">
-          <div className="max-w-[1200px] mx-auto px-6 mb-14 flex flex-col items-center">
-            <h3 className="font-serif uppercase text-2xl md:text-3xl text-white font-bold flex items-center tracking-[2px]">
-              <Menu className="mr-3 text-[#dbaf56]" size={28} /> HANDCRAFTED CNC
+        <section className="relative w-full py-24 bg-[#0a0a0a] border-t border-white/5">
+          <div className="max-w-[1400px] mx-auto px-6 mb-16 flex flex-col items-center reveal-on-scroll">
+            <h3 className="font-serif uppercase text-3xl md:text-4xl text-white font-bold flex items-center tracking-[3px]">
+              <span className="text-[#dbaf56] mr-4">—</span> HANDCRAFTED CNC <span className="text-[#dbaf56] ml-4">—</span>
             </h3>
           </div>
 
-          <div className="max-w-[1300px] mx-auto grid grid-cols-1 md:grid-cols-4 grid-rows-none md:grid-rows-2 gap-4 md:gap-6 px-6 h-auto md:h-[650px]">
+          <div className="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-4 grid-rows-none md:grid-rows-2 gap-4 md:gap-6 px-6 h-auto md:h-[800px] reveal-on-scroll stagger-1">
             {collectionGrid.map((item, idx) => (
-              <div key={idx} className={`relative overflow-hidden group cursor-pointer bg-[#111111] border border-white/10 ${item.colSpan} min-h-[300px] md:min-h-[auto]`}>
-                <img src={item.img} className="absolute inset-0 w-full h-full object-cover opacity-60 transition-transform duration-1000 group-hover:scale-110 group-hover:opacity-80" alt={item.title} />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
-                <div className="absolute bottom-8 left-8 right-8 z-10 flex flex-col items-start">
-                  <span className="text-[#dbaf56] text-[10px] md:text-xs tracking-[3px] uppercase mb-2 font-serif font-medium">{item.subtitle}</span>
-                  <h2 className="font-serif text-white uppercase text-xl md:text-2xl font-bold tracking-[2px] leading-tight">{item.title}</h2>
+              <div key={idx} className={`relative overflow-hidden group cursor-pointer bg-[#050505] border border-white/5 ${item.colSpan} min-h-[350px] md:min-h-[auto] card-shimmer`}>
+                <img src={item.img} className="absolute inset-0 w-full h-full object-cover opacity-50 transition-transform duration-[2s] ease-out group-hover:scale-110 group-hover:opacity-70 grayscale-[30%] group-hover:grayscale-0" alt={item.title} />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/40 to-transparent transition-opacity duration-700 opacity-90 group-hover:opacity-70"></div>
+                <div className="absolute bottom-10 left-10 right-10 z-10 flex flex-col items-start transform transition-transform duration-500 translate-y-2 group-hover:translate-y-0">
+                  <span className="text-[#dbaf56] text-[10px] md:text-xs tracking-[4px] uppercase mb-3 font-serif font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-500">{item.subtitle}</span>
+                  <h2 className="font-serif text-white uppercase text-2xl md:text-3xl font-bold tracking-[3px] leading-tight">{item.title}</h2>
+                  <div className="w-0 h-[2px] bg-[#dbaf56] mt-4 transition-all duration-700 ease-out group-hover:w-16"></div>
                 </div>
               </div>
             ))}
           </div>
           
-          <div className="text-center mt-14">
-            <a href="#" className="border-2 border-white/40 px-8 py-3 text-sm font-serif uppercase tracking-[2px] text-white hover:bg-white hover:text-black hover:border-white transition-all inline-flex items-center">
-              SHOP ALL WATCHES <ChevronRight size={16} className="ml-2" />
+          <div className="text-center mt-20 reveal-on-scroll stagger-2">
+            <a href="#" className="btn-premium inline-flex items-center group">
+              <span className="relative z-10 font-bold">SHOP ALL WATCHES</span>
+              <ChevronRight size={16} className="ml-3 relative z-10 transform group-hover:translate-x-1 transition-transform" />
             </a>
           </div>
         </section>
 
-        {/* SOCIAL SHOWCASE & VALUE PROPS */}
-        <section className="w-full py-24 bg-[#111111] border-t border-white/5">
-          <div className="max-w-[1300px] mx-auto px-6">
-            
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-10 mb-20">
-              <div className="flex flex-col justify-center">
-                <h3 className="font-serif uppercase text-2xl md:text-3xl text-white font-bold flex items-center mb-6 tracking-[2px]">
-                  <Menu className="mr-3 text-[#dbaf56]" size={28} /> HY ON SOCIAL
+        <section className="relative w-full py-28 bg-[#050505] border-t border-white/5 overflow-hidden">
+          <div className="ambient-glow bottom-0 left-0 w-[600px] h-[600px]"></div>
+          
+          <div className="max-w-[1400px] mx-auto px-6 relative z-10">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-10 md:gap-12 mb-28">
+              
+              <div className="flex flex-col justify-center reveal-on-scroll pr-8">
+                <h3 className="font-serif uppercase text-3xl text-white font-bold flex items-center mb-8 tracking-[3px]">
+                  <span className="text-[#dbaf56] mr-4">—</span> HY ON SOCIAL
                 </h3>
-                <p className="font-sans text-gray-400 leading-relaxed mb-4 text-[15px]">
-                  Follow <strong className="text-white font-medium">HY Watches</strong> on <strong className="text-white font-medium">TikTok</strong>, <strong className="text-white font-medium">Instagram</strong> and <strong className="text-white font-medium">Facebook</strong> for real unboxing videos, detailed product reviews, new arrivals updates and watch insights.
+                <p className="font-sans text-gray-400 leading-[1.8] mb-6 text-[15px] font-light">
+                  Follow <strong className="text-white font-medium">HY Watches</strong> on TikTok, Instagram and Facebook for real unboxing videos, detailed product reviews, new arrivals updates and watch insights.
                 </p>
-                <p className="font-sans text-gray-400 leading-relaxed text-[15px]">
+                <p className="font-sans text-gray-400 leading-[1.8] text-[15px] font-light">
                   Every piece you see is filmed honestly so you can observe the finishing, proportions and wrist presence before making your decision.
                 </p>
               </div>
               
               {[
-                { type: 'TIKTOK', icon: <Play size={18} />, videoSrc: 'https://lucytimepieces.com/wp-content/uploads/2026/03/01.mp4', link: '#' },
-                { type: 'INSTAGRAM', icon: <Instagram size={18} />, videoSrc: 'https://lucytimepieces.com/wp-content/uploads/2026/03/02.mp4', link: '#' },
-                { type: 'FACEBOOK', icon: <Facebook size={18} />, videoSrc: 'https://lucytimepieces.com/wp-content/uploads/2025/06/lucytimepieces-com-1.mp4', link: '#' }
+                { type: 'TIKTOK', icon: <Play size={16} />, videoSrc: 'https://lucytimepieces.com/wp-content/uploads/2026/03/01.mp4', link: '#' },
+                { type: 'INSTAGRAM', icon: <Instagram size={16} />, videoSrc: 'https://lucytimepieces.com/wp-content/uploads/2026/03/02.mp4', link: '#' },
+                { type: 'FACEBOOK', icon: <Facebook size={16} />, videoSrc: 'https://lucytimepieces.com/wp-content/uploads/2025/06/lucytimepieces-com-1.mp4', link: '#' }
               ].map((social, idx) => (
-                <div key={idx} className="flex flex-col">
-                  <a href={social.link} className="flex items-center text-white font-serif font-bold uppercase tracking-[2px] mb-5 hover:text-[#dbaf56] transition-colors text-sm">
-                    <span className="mr-2 text-[#dbaf56]">{social.icon}</span> {social.type} <ChevronRight size={14} className="ml-1" />
+                <div key={idx} className={`flex flex-col reveal-on-scroll stagger-${idx + 1}`}>
+                  <a href={social.link} className="flex items-center text-white font-serif font-bold uppercase tracking-[3px] mb-6 hover:text-[#dbaf56] transition-colors text-xs">
+                    <span className="mr-3 text-[#dbaf56]">{social.icon}</span> {social.type} <ChevronRight size={14} className="ml-2 opacity-50" />
                   </a>
-                  <div className="relative aspect-[3/4] bg-[#0a0a0a] overflow-hidden group cursor-pointer shadow-2xl border border-white/10 rounded-sm">
-                    <video className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:scale-105 transition-transform duration-1000 group-hover:opacity-100" preload="auto" playsInline autoPlay muted loop>
+                  <div className="relative aspect-[3/4] bg-[#0a0a0a] overflow-hidden group cursor-pointer shadow-[0_20px_40px_rgba(0,0,0,0.6)] border border-white/5 rounded-sm">
+                    <video className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-[1.5s] ease-out group-hover:opacity-90" preload="auto" playsInline autoPlay muted loop>
                       <source src={social.videoSrc} type="video/mp4" />
                     </video>
-                    <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500 pointer-events-none"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent group-hover:opacity-0 transition-opacity duration-500 pointer-events-none"></div>
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <div className="w-16 h-16 rounded-full border border-white/40 flex items-center justify-center text-white backdrop-blur-md bg-black/20 group-hover:bg-[#dbaf56] group-hover:text-black group-hover:border-[#dbaf56] transition-all duration-300 transform group-hover:scale-110">
-                        <Play size={24} className="ml-1 fill-current" />
+                      <div className="w-16 h-16 rounded-full border border-white/30 flex items-center justify-center text-white backdrop-blur-md bg-black/30 group-hover:bg-[#dbaf56] group-hover:text-black group-hover:border-[#dbaf56] transition-all duration-500 transform group-hover:scale-110 shadow-lg">
+                        <Play size={20} className="ml-1 fill-current" />
                       </div>
                     </div>
                   </div>
@@ -324,22 +376,21 @@ export default function App() {
               ))}
             </div>
 
-            {/* VALUE PROPOSITION BADGES */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 pt-20 border-t border-white/10">
-              <div className="flex flex-col items-center text-center px-4">
-                <Package size={50} strokeWidth={1} className="text-[#dbaf56] mb-6" />
-                <h4 className="font-serif font-bold uppercase tracking-[2px] text-xl text-white mb-4">Free Shipping</h4>
-                <p className="font-sans text-gray-400 leading-relaxed max-w-[300px] text-[15px]">Free worldwide shipping via <strong className="text-white font-medium">FedEx, DHL, UPS</strong>, delivered securely within <strong className="text-white font-medium">7-14 days</strong>.</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-16 pt-24 border-t border-white/10 reveal-on-scroll">
+              <div className="flex flex-col items-center text-center px-6">
+                <Package size={40} strokeWidth={1} className="text-[#dbaf56] mb-8" />
+                <h4 className="font-serif font-bold uppercase tracking-[2px] text-lg text-white mb-4">Free Shipping</h4>
+                <p className="font-sans text-gray-400 leading-[1.8] max-w-[320px] text-[14px] font-light">Free worldwide shipping via <strong className="text-white font-medium">FedEx, DHL, UPS</strong>, delivered securely within <strong className="text-white font-medium">7-14 days</strong>.</p>
               </div>
-              <div className="flex flex-col items-center text-center px-4">
-                <CreditCard size={50} strokeWidth={1} className="text-[#dbaf56] mb-6" />
-                <h4 className="font-serif font-bold uppercase tracking-[2px] text-xl text-white mb-4">Pay Before Delivery</h4>
-                <p className="font-sans text-gray-400 leading-relaxed max-w-[300px] text-[15px]">Easy and secure payments via <strong className="text-white font-medium">PayPal, Crypto, Visa & MasterCard</strong>. 100% safe and protected.</p>
+              <div className="flex flex-col items-center text-center px-6 border-t md:border-t-0 md:border-l border-white/10 pt-12 md:pt-0">
+                <CreditCard size={40} strokeWidth={1} className="text-[#dbaf56] mb-8" />
+                <h4 className="font-serif font-bold uppercase tracking-[2px] text-lg text-white mb-4">Pay Before Delivery</h4>
+                <p className="font-sans text-gray-400 leading-[1.8] max-w-[320px] text-[14px] font-light">Easy and secure payments via <strong className="text-white font-medium">PayPal, Crypto, Visa & MasterCard</strong>. 100% safe and protected.</p>
               </div>
-              <div className="flex flex-col items-center text-center px-4">
-                <ShieldCheck size={50} strokeWidth={1} className="text-[#dbaf56] mb-6" />
-                <h4 className="font-serif font-bold uppercase tracking-[2px] text-xl text-white mb-4">Warranty & Returns</h4>
-                <p className="font-sans text-gray-400 leading-relaxed max-w-[300px] text-[15px]"><strong className="text-white font-medium">2-5 year warranty</strong> on all products. <strong className="text-white font-medium">100% replacement</strong> within <strong className="text-white font-medium">7 days</strong> for delivery defects.</p>
+              <div className="flex flex-col items-center text-center px-6 border-t md:border-t-0 md:border-l border-white/10 pt-12 md:pt-0">
+                <ShieldCheck size={40} strokeWidth={1} className="text-[#dbaf56] mb-8" />
+                <h4 className="font-serif font-bold uppercase tracking-[2px] text-lg text-white mb-4">Warranty & Returns</h4>
+                <p className="font-sans text-gray-400 leading-[1.8] max-w-[320px] text-[14px] font-light"><strong className="text-white font-medium">2-5 year warranty</strong> on all products. <strong className="text-white font-medium">100% replacement</strong> within <strong className="text-white font-medium">7 days</strong> for delivery defects.</p>
               </div>
             </div>
 
@@ -347,71 +398,69 @@ export default function App() {
         </section>
       </main>
 
-      {/* FOOTER */}
-      <footer className="w-full bg-[#050505] pt-20 border-t border-white/10 flex-shrink-0">
-        <div className="max-w-[1300px] mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-16 pb-16">
+      <footer className="w-full bg-[#030303] pt-24 border-t border-white/10 flex-shrink-0 relative overflow-hidden">
+        <div className="max-w-[1400px] mx-auto px-8 relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-16 md:gap-20 pb-20">
             
             <div className="flex flex-col">
-              <h3 className="font-serif uppercase tracking-[3px] text-xl font-bold mb-6 text-white">HY WATCHES</h3>
-              <p className="font-sans text-gray-400 text-[15px] leading-relaxed pr-4">
-                Confidently operating from our headquarters in <strong className="text-white font-medium">Australia</strong>, we are proud to be trusted and selected to distribute <strong className="text-[#dbaf56] font-medium">finely crafted products of exceptional quality</strong> to customers worldwide, helping to elevate the luxury experience and make premium products more accessible than ever.
+              <h3 className="font-serif uppercase tracking-[4px] text-2xl font-bold mb-8 text-white">HY WATCHES</h3>
+              <p className="font-sans text-gray-500 text-[14px] leading-[1.8] pr-4 font-light">
+                Confidently operating from our headquarters in <strong className="text-gray-300 font-medium">Australia</strong>, we are proud to be trusted and selected to distribute <strong className="text-[#dbaf56] font-medium">finely crafted products of exceptional quality</strong> to customers worldwide, helping to elevate the luxury experience and make premium products more accessible than ever.
               </p>
             </div>
 
             <div className="flex flex-col">
-              <h3 className="font-serif uppercase tracking-[2px] text-lg font-bold mb-6 text-white">CONTACT INFO</h3>
-              <div className="font-sans text-gray-400 text-[15px] space-y-3">
-                <p><strong className="text-white font-medium uppercase tracking-wide">HY SYSTEMS Australia</strong><br/><span className="mt-1 inline-block">Australia</span></p>
-                <p className="pt-2"><strong className="text-white font-medium">Email:</strong><br/><a href="mailto:info.hywatches@gmail.com" className="hover:text-[#dbaf56] transition-colors">info.hywatches@gmail.com</a></p>
-                <p><strong className="text-white font-medium">WhatsApp:</strong><br/><span className="hover:text-[#dbaf56] transition-colors cursor-pointer">(+61) 000 000 000</span></p>
+              <h3 className="font-serif uppercase tracking-[2px] text-lg font-bold mb-8 text-white">CONTACT INFO</h3>
+              <div className="font-sans text-gray-500 text-[14px] space-y-4 font-light">
+                <p><strong className="text-white font-medium uppercase tracking-[1px] text-xs">HY SYSTEMS Australia</strong><br/><span className="mt-2 inline-block">Australia</span></p>
+                <p className="pt-2"><strong className="text-white font-medium tracking-[1px] text-xs uppercase">Email</strong><br/><a href="mailto:info.hywatches@gmail.com" className="hover:text-[#dbaf56] transition-colors mt-1 inline-block">info.hywatches@gmail.com</a></p>
+                <p><strong className="text-white font-medium tracking-[1px] text-xs uppercase">WhatsApp</strong><br/><span className="hover:text-[#dbaf56] transition-colors cursor-pointer mt-1 inline-block">(+61) 000 000 000</span></p>
               </div>
-              <div className="flex space-x-3 mt-8">
-                <a href="#" className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white hover:bg-[#dbaf56] hover:border-[#dbaf56] hover:text-black transition-all duration-300"><Instagram size={18} /></a>
-                <a href="#" className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white hover:bg-[#dbaf56] hover:border-[#dbaf56] hover:text-black transition-all duration-300"><Facebook size={18} /></a>
+              <div className="flex space-x-4 mt-10">
+                <a href="#" className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white hover:bg-[#dbaf56] hover:border-[#dbaf56] hover:text-black transition-all duration-300"><Instagram size={16} /></a>
+                <a href="#" className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white hover:bg-[#dbaf56] hover:border-[#dbaf56] hover:text-black transition-all duration-300"><Facebook size={16} /></a>
               </div>
             </div>
 
             <div className="flex flex-col">
-              <h3 className="font-serif uppercase tracking-[2px] text-lg font-bold mb-6 text-white">MORE INFO</h3>
-              <ul className="space-y-4 font-sans text-[15px] font-medium">
-                <li><a href="#" className="text-gray-400 hover:text-[#dbaf56] transition-colors flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-white/20 mr-3"></span> Social Media</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-[#dbaf56] transition-colors flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-white/20 mr-3"></span> How To Order</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-[#dbaf56] transition-colors flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-white/20 mr-3"></span> Payment Policy</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-[#dbaf56] transition-colors flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-white/20 mr-3"></span> Shipping Policy</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-[#dbaf56] transition-colors flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-white/20 mr-3"></span> Privacy Policy</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-[#dbaf56] transition-colors flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-white/20 mr-3"></span> Service & Warranty</a></li>
+              <h3 className="font-serif uppercase tracking-[2px] text-lg font-bold mb-8 text-white">MORE INFO</h3>
+              <ul className="space-y-4 font-sans text-[14px] font-light">
+                <li><a href="#" className="text-gray-500 hover:text-[#dbaf56] transition-all flex items-center group"><span className="w-4 h-[1px] bg-white/20 mr-3 group-hover:w-6 group-hover:bg-[#dbaf56] transition-all"></span> Social Media</a></li>
+                <li><a href="#" className="text-gray-500 hover:text-[#dbaf56] transition-all flex items-center group"><span className="w-4 h-[1px] bg-white/20 mr-3 group-hover:w-6 group-hover:bg-[#dbaf56] transition-all"></span> How To Order</a></li>
+                <li><a href="#" className="text-gray-500 hover:text-[#dbaf56] transition-all flex items-center group"><span className="w-4 h-[1px] bg-white/20 mr-3 group-hover:w-6 group-hover:bg-[#dbaf56] transition-all"></span> Payment Policy</a></li>
+                <li><a href="#" className="text-gray-500 hover:text-[#dbaf56] transition-all flex items-center group"><span className="w-4 h-[1px] bg-white/20 mr-3 group-hover:w-6 group-hover:bg-[#dbaf56] transition-all"></span> Shipping Policy</a></li>
+                <li><a href="#" className="text-gray-500 hover:text-[#dbaf56] transition-all flex items-center group"><span className="w-4 h-[1px] bg-white/20 mr-3 group-hover:w-6 group-hover:bg-[#dbaf56] transition-all"></span> Privacy Policy</a></li>
+                <li><a href="#" className="text-gray-500 hover:text-[#dbaf56] transition-all flex items-center group"><span className="w-4 h-[1px] bg-white/20 mr-3 group-hover:w-6 group-hover:bg-[#dbaf56] transition-all"></span> Service & Warranty</a></li>
               </ul>
             </div>
 
             <div className="flex flex-col">
-              <h3 className="font-serif uppercase tracking-[2px] text-lg font-bold mb-6 text-white">COLLECTIONS</h3>
-              <ul className="grid grid-cols-2 gap-y-4 gap-x-2 font-sans text-[15px] font-medium">
-                <li><a href="#" className="text-gray-400 hover:text-[#dbaf56] transition-colors flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-white/20 mr-2.5"></span> All Collections</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-[#dbaf56] transition-colors flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-white/20 mr-2.5"></span> Hublot</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-[#dbaf56] transition-colors flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-white/20 mr-2.5"></span> Rolex</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-[#dbaf56] transition-colors flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-white/20 mr-2.5"></span> Cartier</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-[#dbaf56] transition-colors flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-white/20 mr-2.5"></span> Omega</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-[#dbaf56] transition-colors flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-white/20 mr-2.5"></span> Tudor</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-[#dbaf56] transition-colors flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-white/20 mr-2.5"></span> Patek Philippe</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-[#dbaf56] transition-colors flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-white/20 mr-2.5"></span> Audemars Piguet</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-[#dbaf56] transition-colors flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-white/20 mr-2.5"></span> Vacheron</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-[#dbaf56] transition-colors flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-white/20 mr-2.5"></span> Richard Mille</a></li>
+              <h3 className="font-serif uppercase tracking-[2px] text-lg font-bold mb-8 text-white">COLLECTIONS</h3>
+              <ul className="grid grid-cols-2 gap-y-4 gap-x-6 font-sans text-[14px] font-light">
+                <li><a href="#" className="text-gray-500 hover:text-[#dbaf56] transition-colors block">All Collections</a></li>
+                <li><a href="#" className="text-gray-500 hover:text-[#dbaf56] transition-colors block">Hublot</a></li>
+                <li><a href="#" className="text-gray-500 hover:text-[#dbaf56] transition-colors block">Rolex</a></li>
+                <li><a href="#" className="text-gray-500 hover:text-[#dbaf56] transition-colors block">Cartier</a></li>
+                <li><a href="#" className="text-gray-500 hover:text-[#dbaf56] transition-colors block">Omega</a></li>
+                <li><a href="#" className="text-gray-500 hover:text-[#dbaf56] transition-colors block">Tudor</a></li>
+                <li><a href="#" className="text-gray-500 hover:text-[#dbaf56] transition-colors block">Patek Philippe</a></li>
+                <li><a href="#" className="text-gray-500 hover:text-[#dbaf56] transition-colors block">Audemars Piguet</a></li>
+                <li><a href="#" className="text-gray-500 hover:text-[#dbaf56] transition-colors block">Vacheron</a></li>
+                <li><a href="#" className="text-gray-500 hover:text-[#dbaf56] transition-colors block">Richard Mille</a></li>
               </ul>
             </div>
 
           </div>
         </div>
         
-        <div className="w-full bg-[#000000] py-6 border-t border-white/10 text-center">
+        <div className="w-full bg-black py-8 border-t border-white/5 text-center relative z-10">
           <div className="container mx-auto px-6">
-            <p className="font-sans text-[11px] md:text-xs text-gray-500 uppercase tracking-[3px] font-medium">
+            <p className="font-sans text-[10px] md:text-xs text-gray-600 uppercase tracking-[4px] font-medium">
               ©2026, HY WATCHES™ BY HY SYSTEMS. ALL RIGHTS RESERVED.
             </p>
           </div>
         </div>
       </footer>
-      
     </div>
   )
 }

@@ -187,7 +187,7 @@ export default function App() {
         
         <div className="relative w-full h-screen bg-black overflow-hidden flex items-center justify-center">
           <video className="absolute inset-0 w-full h-full object-cover opacity-60 slow-zoom pointer-events-none" preload="auto" playsInline autoPlay muted loop>
-            <source src="https://assets.mixkit.co/videos/preview/mixkit-luxury-watch-on-a-dark-background-4240-large.mp4" type="video/mp4" />
+            <source src="https://lucytimepieces.com/wp-content/uploads/2026/03/02.mp4" type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/90 pointer-events-none"></div>
           
@@ -353,9 +353,9 @@ export default function App() {
               </div>
               
               {[
-                { type: 'TIKTOK', icon: <Play size={16} />, videoSrc: 'https://lucytimepieces.com/wp-content/uploads/2026/03/01.mp4', link: '#' },
-                { type: 'INSTAGRAM', icon: <Instagram size={16} />, videoSrc: 'https://lucytimepieces.com/wp-content/uploads/2026/03/26240ST-TRANG.mov', link: '#' },
-                { type: 'FACEBOOK', icon: <Facebook size={16} />, videoSrc: 'https://assets.mixkit.co/videos/preview/mixkit-man-putting-on-a-luxury-watch-4244-large.mp4', link: '#' }
+                { type: 'TIKTOK', icon: <Play size={16} />, videoSrc: 'https://lucytimepieces.com/wp-content/uploads/2026/03/26240ST-TRANG.mov', link: '#' },
+                { type: 'INSTAGRAM', icon: <Instagram size={16} />, videoSrc: 'https://lucytimepieces.com/wp-content/uploads/2026/03/01.mp4', link: '#' },
+                { type: 'FACEBOOK', icon: <Facebook size={16} />, videoSrc: 'https://lucytimepieces.com/wp-content/uploads/2025/06/lucytimepieces-com-1.mp4', link: '#' }
               ].map((social, idx) => (
                 <div key={idx} className={`flex flex-col reveal-on-scroll stagger-${idx + 1}`}>
                   <a href={social.link} className="flex items-center text-white font-serif font-bold uppercase tracking-[3px] mb-6 hover:text-[#dbaf56] transition-colors text-xs">
@@ -363,7 +363,7 @@ export default function App() {
                   </a>
                   <div className="relative aspect-[3/4] bg-[#0a0a0a] overflow-hidden group cursor-pointer shadow-[0_20px_40px_rgba(0,0,0,0.6)] border border-white/5 rounded-sm">
                     <video className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-[1.5s] ease-out group-hover:opacity-90" preload="auto" playsInline autoPlay muted loop>
-                      <source src={social.videoSrc} type="video/mp4" />
+                      <source src={social.videoSrc} />
                     </video>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent group-hover:opacity-0 transition-opacity duration-500 pointer-events-none"></div>
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">

@@ -1,11 +1,43 @@
-import React, { useState, useEffect, createContext, useContext, ReactNode, useRef } from 'react';
+import React, { useState, useEffect, createContext, useContext, ReactNode, useRef, Component, ErrorInfo } from 'react';
 import { 
   Search, Globe, ShoppingBag, Menu, ChevronLeft, ChevronRight, 
   Star, Play, Package, CreditCard, ShieldCheck, X, Instagram, 
   Facebook, ArrowRight, ArrowUpRight, Watch, Clock, Shield,
-  Mail, MapPin, Phone, CheckCircle, AlertCircle, Filter, SlidersHorizontal,
+  Mail, MapPin, Phone, CheckCircle, AlertCircle, Filter,
   MessageCircle
 } from 'lucide-react';
+
+// ==========================================
+// ERROR BOUNDARY (CATCHES FATAL CRASHES)
+// ==========================================
+class ErrorBoundary extends Component<{children: ReactNode}, {hasError: boolean, error: Error | null}> {
+  constructor(props: {children: ReactNode}) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error("Application Crash Detected:", error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: '2rem', color: '#ff4444', backgroundColor: '#000', minHeight: '100vh', fontFamily: 'monospace' }}>
+          <h2>Application Error</h2>
+          <p>{this.state.error?.toString()}</p>
+          <p>Please check the developer console for exact line numbers.</p>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+// ==========================================
+// DATA MAPPING & ASSETS
+// ==========================================
 
 const WATCH_DATABASE = [
   { id: 'RM-01', brand: 'Richard Mille', model: 'RM67-02 Black Carbon TPT "BLUE TIFFANY"', price: 4600, category: 'Carbon', description: 'Engineered for optimal performance on the wrist of elite athletes. The RM 67-02 weighs a mere 32 grams, utilizing TPT composite materials and a grade 5 titanium baseplate. The blue Tiffany accents provide a striking contrast against the dark carbon matrix.', specs: { material: 'Carbon TPT', movement: 'Automatic CRMA7', reserve: '50 Hours', waterResist: '30m', diameter: '38.7mm' }, image: 'https://lucytimepieces.com/wp-content/uploads/2026/07/14-247x247.png', images: ['https://lucytimepieces.com/wp-content/uploads/2026/07/14-247x247.png', 'https://lucytimepieces.com/wp-content/uploads/2026/07/14-247x247.png'], tag: 'LIMITED' },
@@ -92,7 +124,7 @@ function AppProvider({ children }: { children: ReactNode }) {
     setCartItems(prev => prev.filter((_, i) => i !== index));
   };
 
-  const cartTotal = cartItems.reduce((sum, item) => sum + item.price, 0);
+  const cartTotal = cartItems.reduce((sum, item) => sum + (item?.price || 0), 0);
 
   return (
     <AppContext.Provider value={{
@@ -286,7 +318,7 @@ function Header() {
             <button onClick={() => navigate('SHOP')} className="text-white hover:text-[#c5a059] transition-colors"><Search size={18} /></button>
             <button className="text-white hover:text-[#c5a059] transition-colors relative" onClick={() => setCartOpen(true)}>
               <ShoppingBag size={18} />
-              <span className="absolute -top-1.5 -right-2 bg-[#c5a059] text-black text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">{cartItems.length}</span>
+              <span className="absolute -top-1.5 -right-2 bg-[#c5a059] text-black text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">{cartItems?.length || 0}</span>
             </button>
           </div>
           <button className="flex items-center space-x-3 text-white hover:text-[#c5a059] transition-colors" onClick={() => setMobileMenuOpen(true)}>
@@ -340,7 +372,7 @@ function CartDrawer() {
           </button>
         </div>
         <div className="flex flex-col flex-grow p-8 overflow-y-auto">
-          {cartItems.length === 0 ? (
+          {(!cartItems || cartItems.length === 0) ? (
             <div className="flex flex-col items-center justify-center h-full text-gray-500">
               <ShoppingBag size={48} className="mb-4 opacity-50" />
               <p className="font-serif uppercase tracking-[2px]">Vault is Empty</p>
@@ -349,11 +381,11 @@ function CartDrawer() {
             <div className="space-y-6">
               {cartItems.map((item, idx) => (
                 <div key={idx} className="flex items-center gap-4 bg-[#0a0a0a] p-4 border border-white/5">
-                  <img src={item.image || (item.images && item.images[0])} alt={item.model} className="w-20 h-20 object-contain bg-[#111]" />
+                  <img src={item?.image || item?.images?.[0]} alt={item?.model} className="w-20 h-20 object-contain bg-[#111]" />
                   <div className="flex-grow">
-                    <p className="text-[10px] text-[#c5a059] tracking-[2px] uppercase font-serif mb-1">{item.brand}</p>
-                    <p className="text-xs font-mono text-gray-300 line-clamp-2">{item.model}</p>
-                    <p className="font-bold text-sm mt-2">${item.price},000</p>
+                    <p className="text-[10px] text-[#c5a059] tracking-[2px] uppercase font-serif mb-1">{item?.brand}</p>
+                    <p className="text-xs font-mono text-gray-300 line-clamp-2">{item?.model}</p>
+                    <p className="font-bold text-sm mt-2">${item?.price || 0},000</p>
                   </div>
                   <button onClick={() => removeFromCart(idx)} className="text-gray-500 hover:text-red-500 transition-colors">
                     <X size={16} />
@@ -371,8 +403,8 @@ function CartDrawer() {
           <button 
             className="btn-gold w-full" 
             onClick={() => { setCartOpen(false); navigate('CONTACT'); }}
-            disabled={cartItems.length === 0}
-            style={{ opacity: cartItems.length === 0 ? 0.5 : 1, cursor: cartItems.length === 0 ? 'not-allowed' : 'pointer' }}
+            disabled={!cartItems || cartItems.length === 0}
+            style={{ opacity: (!cartItems || cartItems.length === 0) ? 0.5 : 1, cursor: (!cartItems || cartItems.length === 0) ? 'not-allowed' : 'pointer' }}
           >
             <span className="relative z-10">INITIATE SECURE CHECKOUT</span>
           </button>
@@ -472,17 +504,17 @@ export function ProductModal({ product, isOpen, onClose }: { product: any, isOpe
         </button>
         <div className="w-full md:w-1/2 bg-[#0a0a0a] relative flex flex-col border-r border-white/5">
           <div className="absolute top-6 left-6 z-10 flex gap-2">
-            <span className="bg-[#c5a059] text-black text-[10px] font-bold px-3 py-1.5 uppercase tracking-[2px] shadow-lg">{product.tag}</span>
+            <span className="bg-[#c5a059] text-black text-[10px] font-bold px-3 py-1.5 uppercase tracking-[2px] shadow-lg">{product?.tag}</span>
             <span className="bg-white/10 backdrop-blur-md text-white border border-white/20 text-[10px] font-bold px-3 py-1.5 uppercase tracking-[2px]">In Stock</span>
           </div>
           <div className="relative flex-grow flex items-center justify-center p-12 cursor-crosshair overflow-hidden group" onMouseEnter={() => setIsZoomed(true)} onMouseLeave={() => setIsZoomed(false)} onMouseMove={handleMouseMove}>
-            <img src={(product.images && product.images[activeImage]) || product.image} alt={product.model} className={`w-full h-full object-contain transition-transform duration-300 ${isZoomed ? 'opacity-0' : 'opacity-100'}`} />
+            <img src={product?.images?.[activeImage] || product?.image} alt={product?.model} className={`w-full h-full object-contain transition-transform duration-300 ${isZoomed ? 'opacity-0' : 'opacity-100'}`} />
             {isZoomed && (
-              <div className="absolute inset-0 bg-no-repeat transition-opacity duration-300 opacity-100 z-20" style={{ backgroundImage: `url(${(product.images && product.images[activeImage]) || product.image})`, backgroundPosition: `${mousePos.x}% ${mousePos.y}%`, backgroundSize: '250%' }} />
+              <div className="absolute inset-0 bg-no-repeat transition-opacity duration-300 opacity-100 z-20" style={{ backgroundImage: `url(${product?.images?.[activeImage] || product?.image})`, backgroundPosition: `${mousePos.x}% ${mousePos.y}%`, backgroundSize: '250%' }} />
             )}
           </div>
           <div className="flex p-6 gap-4 border-t border-white/5 bg-[#050505] overflow-x-auto">
-            {(product.images || [product.image]).map((img: string, idx: number) => (
+            {(product?.images || [product?.image]).map((img: string, idx: number) => (
               <button key={idx} onClick={() => setActiveImage(idx)} className={`w-20 h-20 flex-shrink-0 border bg-[#111] transition-all p-2 ${activeImage === idx ? 'border-[#c5a059]' : 'border-white/10 hover:border-white/30'}`}>
                 <img src={img} alt={`Thumbnail ${idx}`} className="w-full h-full object-contain" />
               </button>
@@ -491,27 +523,27 @@ export function ProductModal({ product, isOpen, onClose }: { product: any, isOpe
         </div>
         <div className="w-full md:w-1/2 flex flex-col bg-[#050505] overflow-y-auto">
           <div className="p-8 md:p-12">
-            <span className="text-[#c5a059] text-[11px] tracking-[4px] uppercase font-serif mb-3 block">{product.brand}</span>
-            <h2 className="text-2xl md:text-3xl font-mono font-light text-white mb-6 leading-tight">{product.model}</h2>
+            <span className="text-[#c5a059] text-[11px] tracking-[4px] uppercase font-serif mb-3 block">{product?.brand}</span>
+            <h2 className="text-2xl md:text-3xl font-mono font-light text-white mb-6 leading-tight">{product?.model}</h2>
             <div className="flex items-center gap-4 mb-8">
-              <span className="font-serif text-3xl font-bold text-white tracking-wide">${product.price},000</span>
+              <span className="font-serif text-3xl font-bold text-white tracking-wide">${product?.price || 0},000</span>
               <div className="h-6 w-[1px] bg-white/20"></div>
               <div className="flex items-center text-[#c5a059]">{[1,2,3,4,5].map(s => <Star key={s} size={14} className="fill-current" />)}</div>
             </div>
-            <p className="text-gray-400 font-light text-sm leading-[1.8] mb-10 pb-10 border-b border-white/10">{product.description}</p>
+            <p className="text-gray-400 font-light text-sm leading-[1.8] mb-10 pb-10 border-b border-white/10">{product?.description}</p>
             <h3 className="font-serif uppercase tracking-[2px] text-xs font-bold text-white mb-6">Technical Specifications</h3>
             <div className="grid grid-cols-2 gap-y-6 gap-x-8 mb-12">
               <div className="flex flex-col border-l-2 border-[#c5a059] pl-4">
-                <span className="text-[10px] uppercase tracking-[2px] text-gray-500 mb-1">Material</span><span className="text-sm text-gray-200 font-light">{product.specs?.material}</span>
+                <span className="text-[10px] uppercase tracking-[2px] text-gray-500 mb-1">Material</span><span className="text-sm text-gray-200 font-light">{product?.specs?.material}</span>
               </div>
               <div className="flex flex-col border-l-2 border-[#c5a059] pl-4">
-                <span className="text-[10px] uppercase tracking-[2px] text-gray-500 mb-1">Caliber</span><span className="text-sm text-gray-200 font-light">{product.specs?.movement}</span>
+                <span className="text-[10px] uppercase tracking-[2px] text-gray-500 mb-1">Caliber</span><span className="text-sm text-gray-200 font-light">{product?.specs?.movement}</span>
               </div>
               <div className="flex flex-col border-l-2 border-[#c5a059] pl-4">
-                <span className="text-[10px] uppercase tracking-[2px] text-gray-500 mb-1">Dimensions</span><span className="text-sm text-gray-200 font-light">{product.specs?.diameter}</span>
+                <span className="text-[10px] uppercase tracking-[2px] text-gray-500 mb-1">Dimensions</span><span className="text-sm text-gray-200 font-light">{product?.specs?.diameter}</span>
               </div>
               <div className="flex flex-col border-l-2 border-[#c5a059] pl-4">
-                <span className="text-[10px] uppercase tracking-[2px] text-gray-500 mb-1">Resistance</span><span className="text-sm text-gray-200 font-light">{product.specs?.waterResist}</span>
+                <span className="text-[10px] uppercase tracking-[2px] text-gray-500 mb-1">Resistance</span><span className="text-sm text-gray-200 font-light">{product?.specs?.waterResist}</span>
               </div>
             </div>
             <div className="flex flex-col gap-4 mt-auto">
@@ -641,11 +673,11 @@ export function SecureCheckout({ isOpen, onClose }: { isOpen: boolean, onClose: 
               <div className="flex-grow overflow-y-auto space-y-6 mb-8 pr-2">
                 {cartItems.map((item, idx) => (
                   <div key={idx} className="flex gap-4 items-start">
-                    <div className="w-16 h-16 bg-[#111] border border-white/5 flex-shrink-0 flex items-center justify-center p-2"><img src={item.image || (item.images && item.images[0])} className="w-full h-full object-contain" alt="" /></div>
+                    <div className="w-16 h-16 bg-[#111] border border-white/5 flex-shrink-0 flex items-center justify-center p-2"><img src={item?.image || item?.images?.[0]} className="w-full h-full object-contain" alt="" /></div>
                     <div>
-                      <p className="text-[9px] text-[#c5a059] tracking-[2px] uppercase font-serif mb-1">{item.brand}</p>
-                      <p className="text-xs font-mono text-gray-300 line-clamp-2 leading-snug mb-2">{item.model}</p>
-                      <p className="font-bold text-sm text-white">${item.price},000</p>
+                      <p className="text-[9px] text-[#c5a059] tracking-[2px] uppercase font-serif mb-1">{item?.brand}</p>
+                      <p className="text-xs font-mono text-gray-300 line-clamp-2 leading-snug mb-2">{item?.model}</p>
+                      <p className="font-bold text-sm text-white">${item?.price || 0},000</p>
                     </div>
                   </div>
                 ))}
@@ -755,8 +787,8 @@ export function HomePage() {
             {WATCH_DATABASE.slice(0, 4).map((product, index) => (
               <div key={product.id} className={`group cursor-pointer flex flex-col bg-transparent p-4 transition-all duration-500 reveal-target delay-${(index % 4) * 100}`}>
                 <div className="relative aspect-[4/5] overflow-hidden bg-[#0a0a0a] mb-6 rounded-sm border border-white/5 group-hover:border-white/20 transition-colors">
-                  <img src={product.image} className="absolute inset-0 w-full h-full object-contain p-8 transition-all duration-700 opacity-100 group-hover:opacity-0 group-hover:scale-110 ease-out" alt={product.title} />
-                  <img src={product.images?.[1] || product.image} className="absolute inset-0 w-full h-full object-cover opacity-0 transition-all duration-700 group-hover:opacity-100 scale-100 group-hover:scale-105 ease-out" alt={`${product.title} alt`} />
+                  <img src={product.image} className="absolute inset-0 w-full h-full object-contain p-8 transition-all duration-700 opacity-100 group-hover:opacity-0 group-hover:scale-110 ease-out" alt={product.model} />
+                  <img src={product.images?.[1] || product.image} className="absolute inset-0 w-full h-full object-cover opacity-0 transition-all duration-700 group-hover:opacity-100 scale-100 group-hover:scale-105 ease-out" alt={product.model} />
                   <div className="absolute top-4 left-4 flex flex-col gap-2 z-20"><span className="bg-white text-black text-[9px] font-bold px-3 py-1.5 uppercase tracking-[2px]">{product.tag}</span></div>
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10 backdrop-blur-sm" onClick={() => { const event = new CustomEvent('openProductModal', { detail: product }); window.dispatchEvent(event); }}>
                     <div className="transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 flex flex-col items-center">
@@ -766,9 +798,9 @@ export function HomePage() {
                   </div>
                 </div>
                 <div className="flex flex-col flex-grow text-center px-2">
-                  <span className="font-serif text-[10px] text-gray-500 uppercase tracking-[2px] mb-2 block">{product.specs.material}</span>
-                  <h4 className="font-mono text-[13px] leading-[1.6] text-gray-300 transition-colors duration-300 group-hover:text-white line-clamp-2 mb-4 font-light">{product.model}</h4>
-                  <p className="font-serif text-xl font-bold text-white mt-auto tracking-wide border-t border-white/10 pt-4">${product.price},000</p>
+                  <span className="font-serif text-[10px] text-gray-500 uppercase tracking-[2px] mb-2 block">{product?.specs?.material}</span>
+                  <h4 className="font-mono text-[13px] leading-[1.6] text-gray-300 transition-colors duration-300 group-hover:text-white line-clamp-2 mb-4 font-light">{product?.model}</h4>
+                  <p className="font-serif text-xl font-bold text-white mt-auto tracking-wide border-t border-white/10 pt-4">${product?.price},000</p>
                 </div>
               </div>
             ))}
@@ -815,7 +847,7 @@ export function ShopPage() {
     <div className="w-full flex flex-col pt-[120px] bg-[#030303] min-h-screen">
       <div className="max-w-[1600px] mx-auto w-full px-6 py-12 flex flex-col lg:flex-row gap-12">
         <div className="w-full lg:w-[280px] flex-shrink-0 border-r border-white/5 pr-8 reveal-target">
-          <h2 className="font-serif uppercase text-2xl tracking-[2px] mb-8 pb-4 border-b border-white/10 flex items-center"><SlidersHorizontal size={18} className="mr-3 text-[#c5a059]"/> INVENTORY</h2>
+          <h2 className="font-serif uppercase text-2xl tracking-[2px] mb-8 pb-4 border-b border-white/10 flex items-center"><Filter size={18} className="mr-3 text-[#c5a059]"/> INVENTORY</h2>
           <div className="space-y-8">
             <div>
               <h3 className="text-xs uppercase tracking-[2px] text-gray-500 mb-4 font-bold">Manufacture</h3>
@@ -840,7 +872,7 @@ export function ShopPage() {
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"><span className="w-12 h-12 rounded-full border border-white flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors"><Search size={16} /></span></div>
                 </div>
                 <div className="flex flex-col flex-grow">
-                  <div className="flex justify-between items-start mb-2"><span className="text-[#c5a059] text-[10px] tracking-[2px] uppercase font-serif">{watch.brand}</span><span className="text-gray-500 text-[10px] tracking-[1px] uppercase border border-gray-700 px-1">{watch.specs.diameter}</span></div>
+                  <div className="flex justify-between items-start mb-2"><span className="text-[#c5a059] text-[10px] tracking-[2px] uppercase font-serif">{watch.brand}</span><span className="text-gray-500 text-[10px] tracking-[1px] uppercase border border-gray-700 px-1">{watch?.specs?.diameter}</span></div>
                   <h4 className="text-[13px] font-mono font-light text-gray-200 mb-3 line-clamp-2 leading-relaxed">{watch.model}</h4>
                   <p className="text-[11px] text-gray-500 font-light mb-6 line-clamp-3">{watch.description}</p>
                   <div className="mt-auto">
@@ -958,9 +990,9 @@ export function Layout() {
   const [preloaderActive, setPreloaderActive] = useState(true);
 
   useEffect(() => {
-    const handleOpenModal = (e: CustomEvent) => { setSelectedProduct(e.detail); setModalOpen(true); };
-    if (typeof window !== 'undefined') window.addEventListener('openProductModal' as any, handleOpenModal as any);
-    return () => { if (typeof window !== 'undefined') window.removeEventListener('openProductModal' as any, handleOpenModal as any); };
+    const handleOpenModal = (e: any) => { setSelectedProduct(e.detail); setModalOpen(true); };
+    if (typeof window !== 'undefined') window.addEventListener('openProductModal', handleOpenModal);
+    return () => { if (typeof window !== 'undefined') window.removeEventListener('openProductModal', handleOpenModal); };
   }, []);
 
   useEffect(() => {
@@ -1003,8 +1035,10 @@ export function Layout() {
 
 export default function App() {
   return (
-    <AppProvider>
-      <Layout />
-    </AppProvider>
+    <ErrorBoundary>
+      <AppProvider>
+        <Layout />
+      </AppProvider>
+    </ErrorBoundary>
   );
 }

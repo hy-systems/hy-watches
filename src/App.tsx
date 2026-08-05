@@ -372,6 +372,377 @@ function Footer() {
 // ==========================================
 // 5. ROOT INJECTION
 // ==========================================
+// ==========================================
+// DATA MAPPING & ASSETS
+// ==========================================
+
+const WATCH_DATABASE = [
+  { id: 'RM-01', brand: 'Richard Mille', model: 'RM67-02 Black Carbon TPT "BLUE TIFFANY"', price: 4600, category: 'Carbon', description: 'Engineered for optimal performance on the wrist of elite athletes. The RM 67-02 weighs a mere 32 grams, utilizing TPT composite materials and a grade 5 titanium baseplate. The blue Tiffany accents provide a striking contrast against the dark carbon matrix.', specs: { material: 'Carbon TPT', movement: 'Automatic CRMA7', reserve: '50 Hours', waterResist: '30m', diameter: '38.7mm' }, image: 'https://lucytimepieces.com/wp-content/uploads/2026/07/14-247x247.png', tag: 'LIMITED' },
+  { id: 'RM-02', brand: 'Richard Mille', model: 'RM67-02 Full Black Carbon TPT NEW 2026', price: 4600, category: 'Carbon', description: 'A stealth interpretation of the ultimate sports watch. The full black carbon construction absorbs light while showcasing the unique damascene patterns inherent to the TPT manufacturing process.', specs: { material: 'Carbon TPT', movement: 'Automatic CRMA7', reserve: '50 Hours', waterResist: '30m', diameter: '38.7mm' }, image: 'https://lucytimepieces.com/wp-content/uploads/2026/07/z8006286682919_f8b17d8de483fd6eea96a18109486c17-247x247.jpg', tag: 'NEW' },
+  { id: 'RM-03', brand: 'Richard Mille', model: 'RM67-01 Extra-Flat Titanium Handcrafted', price: 3600, category: 'Titanium', description: 'The RM 67-01 continues the legacy of the extra-flat watch, an exercise in extreme minimalism without sacrificing the characteristic Richard Mille tonneau shape.', specs: { material: 'Grade 5 Titanium', movement: 'Automatic CRMA6', reserve: '50 Hours', waterResist: '30m', diameter: '38.7mm' }, image: 'https://lucytimepieces.com/wp-content/uploads/2026/06/richard-mille-titanium-rm-67-01-richard-mille-40267223892212-247x247.webp', tag: 'HOT' },
+  { id: 'PP-01', brand: 'Patek Philippe', model: 'Nautilus 5711/1A Green 40mm Custom', price: 5600, category: 'Steel', description: 'The definitive luxury sports watch, reinvented with a highly sought-after olive green sunburst dial. The integrated stainless steel bracelet and porthole case design represent the peak of 1970s Gerald Genta design.', specs: { material: 'Stainless Steel', movement: 'Automatic 26-330 S C', reserve: '45 Hours', waterResist: '120m', diameter: '40mm' }, image: 'https://lucytimepieces.com/wp-content/uploads/2026/05/Thiet-ke-chua-co-ten-49-247x247.png', tag: 'EXCLUSIVE' },
+  { id: 'RX-01', brand: 'Rolex', model: 'Day-Date 228239-0076 VIP Version', price: 920, category: 'White Gold', description: 'The ultimate watch of prestige. Cast in 18kt white gold, this Day-Date features a mesmerizing blue ombre dial that transitions from bright center to dark edges.', specs: { material: '18kt White Gold', movement: 'Automatic 3255', reserve: '70 Hours', waterResist: '100m', diameter: '40mm' }, image: 'https://lucytimepieces.com/wp-content/uploads/2026/05/Dong-ho-nam-Rolex-Day-Date-Rep-11-mat-xanh-ombre-nang-212-gram-bo-may-calibre-3255-xuong-RC-40mm-1-600x600-1-247x247.jpg', tag: 'RESTOCKED' },
+  { id: 'RX-02', brand: 'Rolex', model: 'Datejust 36 M126234-0057 VIP Version', price: 820, category: 'Steel & Gold', description: 'A timeless classic in a versatile 36mm case. Combining Oystersteel and 18kt white gold, this Datejust features the signature fluted bezel and a comfortable Jubilee bracelet.', specs: { material: 'Oystersteel & White Gold', movement: 'Automatic 3235', reserve: '70 Hours', waterResist: '100m', diameter: '36mm' }, image: 'https://lucytimepieces.com/wp-content/uploads/2026/05/Thiet-ke-chua-co-ten-1-10-247x247.png', tag: 'CLASSIC' },
+  { id: 'RX-03', brand: 'Rolex', model: 'Datejust 126233-0017 VIP Version', price: 820, category: 'Two-Tone', description: 'The quintessential Rolex aesthetic. Yellow Rolesor pairs the strength of Oystersteel with the luxury of 18kt yellow gold. The champagne dial and fluted bezel create a warm presence.', specs: { material: 'Yellow Rolesor', movement: 'Automatic 3235', reserve: '70 Hours', waterResist: '100m', diameter: '36mm' }, image: 'https://lucytimepieces.com/wp-content/uploads/2026/05/Thiet-ke-chua-co-ten-1-9-247x247.png', tag: 'POPULAR' },
+  { id: 'RX-04', brand: 'Rolex', model: 'Datejust 126334-0010 Green Ombre New 2026', price: 720, category: 'Steel', description: 'A modern interpretation of the Datejust in a larger 41mm format. The dial features a captivating green ombre finish, transitioning to deep black at the periphery.', specs: { material: 'Oystersteel & White Gold', movement: 'Automatic 3235', reserve: '70 Hours', waterResist: '100m', diameter: '41mm' }, image: 'https://lucytimepieces.com/wp-content/uploads/2026/05/Thiet-ke-chua-co-ten-2-247x247.png', tag: 'TRENDING' },
+];
+
+const popularCollections = [
+  { id: 1, title: 'LUCY PICKS', subtitle: 'HY EXCLUSIVE', img: 'https://lucytimepieces.com/wp-content/uploads/2026/03/rolex-yacht-master-42-226627-rlx-titanium-black-dial-2024-rolex-1193996764.jpg', desc: 'Curated selection of our most coveted and precisely engineered timepieces.' },
+  { id: 2, title: 'DAYTONA', subtitle: 'MOTORSPORT', img: 'https://lucytimepieces.com/wp-content/uploads/2026/03/rolex-daytona-116500ln-stainless-steel-white-panda-dial-2018-rolex-1212087379.jpg', desc: 'Born to race. The ultimate tool watch for those with a passion for driving.' },
+  { id: 3, title: 'GMT-MASTER II', subtitle: 'AVIATION', img: 'https://lucytimepieces.com/wp-content/uploads/2026/03/rolex-gmt-master-ii-126710blnr-batgirl-stainless-steel-black-dial-jubilee-2021-rolex-1206409323.jpg', desc: 'Cross time zones with unparalleled precision and unmistakable aesthetic.' },
+  { id: 4, title: 'DATEJUST', subtitle: 'CLASSIC', img: 'https://lucytimepieces.com/wp-content/uploads/2026/03/rolex-datejust-41-126334-stainless-steel-blue-diamond-dial-jubilee-2021-rolex-1197074364.jpg', desc: 'The archetype of the classic watch. Timeless elegance and functionality.' }
+];
+
+const socialMediaVideos = [
+  { type: 'TIKTOK', icon: <Play size={16} strokeWidth={2.5} />, videoSrc: 'https://assets.mixkit.co/videos/preview/mixkit-hands-of-a-man-adjusting-his-wristwatch-4245-large.mp4', link: '#' },
+  { type: 'INSTAGRAM', icon: <Instagram size={16} strokeWidth={2.5} />, videoSrc: 'https://assets.mixkit.co/videos/preview/mixkit-close-up-of-a-luxury-watch-on-a-mans-wrist-4246-large.mp4', link: '#' },
+  { type: 'FACEBOOK', icon: <Facebook size={16} strokeWidth={2.5} />, videoSrc: 'https://assets.mixkit.co/videos/preview/mixkit-man-putting-on-a-luxury-watch-4244-large.mp4', link: '#' }
+];
+
+// ==========================================
+// PAGE COMPONENTS
+// ==========================================
+
+export function HomePage() {
+  const { navigate, addToCart } = useAppContext();
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const [activeCollectionSlide, setActiveCollectionSlide] = useState(0);
+
+  useEffect(() => {
+    videoRefs.current.forEach(video => {
+      if (video) video.play().catch(() => {});
+    });
+  }, []);
+
+  const nextCollectionSlide = () => setActiveCollectionSlide((prev) => (prev + 1) % popularCollections.length);
+  const prevCollectionSlide = () => setActiveCollectionSlide((prev) => (prev - 1 + popularCollections.length) % popularCollections.length);
+
+  return (
+    <div className="w-full flex flex-col">
+      {/* HERO COMPONENT */}
+      <div className="relative w-full h-screen bg-[#030303] overflow-hidden flex items-center justify-center">
+        <div className="ambient-light bg-[#c5a059] w-[40vw] h-[40vw] top-[30%] left-[30%] parallax-layer" data-speed="0.5"></div>
+        <div className="absolute inset-0 w-full h-full parallax-layer" data-speed="0.2">
+          <video ref={el => videoRefs.current[0] = el} className="w-full h-full object-cover opacity-50 ken-burns" playsInline autoPlay muted loop>
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-luxury-watch-on-a-dark-background-4240-large.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/20 to-[#030303]"></div>
+        <div className="relative z-10 w-full max-w-[1400px] px-6 mx-auto flex flex-col items-center text-center mt-20">
+          <div className="flex items-center space-x-4 mb-8 reveal-target">
+            <span className="w-12 h-[1px] bg-[#c5a059]"></span>
+            <span className="text-[10px] md:text-[12px] tracking-[8px] uppercase text-[#c5a059] font-serif font-bold">2026 COLLECTION</span>
+            <span className="w-12 h-[1px] bg-[#c5a059]"></span>
+          </div>
+          <h1 className="text-5xl md:text-8xl lg:text-[10rem] font-bold uppercase text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500 font-serif leading-[0.85] tracking-tighter mb-10 reveal-target delay-100">
+            SERIES<br/>ALPHA
+          </h1>
+          <p className="max-w-[600px] text-gray-400 font-sans text-sm md:text-base leading-relaxed tracking-wide mb-12 reveal-target delay-200">
+            Discover the pinnacle of horological engineering. Perfectly customized, authenticated, and delivered with uncompromising precision.
+          </p>
+          <div className="reveal-target delay-300">
+            <button onClick={() => navigate('SHOP')} className="btn-gold group">
+              <span className="relative z-10 flex items-center">EXPLORE THE VAULT <ArrowRight size={16} className="ml-3 transform group-hover:translate-x-1 transition-transform" /></span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* DYNAMIC COLLECTIONS SLIDER */}
+      <section className="relative w-full py-32 bg-[#0a0a0a] border-t border-white/5">
+        <div className="max-w-[1600px] mx-auto px-6 md:px-12">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-16 reveal-target">
+            <div>
+              <span className="text-[#c5a059] text-[11px] tracking-[4px] uppercase font-serif block mb-4">Curated Selection</span>
+              <h3 className="font-serif uppercase text-4xl md:text-5xl text-white font-bold tracking-[2px]">FEATURED SERIES</h3>
+            </div>
+            <div className="hidden md:flex space-x-4">
+              <button onClick={prevCollectionSlide} className="w-14 h-14 border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-[#c5a059] hover:text-black hover:border-[#c5a059] transition-all"><ChevronLeft size={20} /></button>
+              <button onClick={nextCollectionSlide} className="w-14 h-14 border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-[#c5a059] hover:text-black hover:border-[#c5a059] transition-all"><ChevronRight size={20} /></button>
+            </div>
+          </div>
+          <div className="relative overflow-hidden w-full reveal-target delay-200">
+            <div className="flex transition-transform duration-1000 ease-[cubic-bezier(0.25,1,0.5,1)]" style={{ transform: `translateX(-${activeCollectionSlide * (100 / (window.innerWidth < 768 ? 1 : 3))}%)` }}>
+              {popularCollections.map((item) => (
+                <div key={item.id} className="w-full md:w-1/3 flex-shrink-0 px-3">
+                  <div className="relative group cursor-pointer overflow-hidden bg-[#111] h-[500px] md:h-[650px] rounded-sm shimmer-card">
+                    <img src={item.img} alt={item.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-[2s] ease-out group-hover:scale-110 opacity-70 group-hover:opacity-100" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-80 group-hover:opacity-60 transition-opacity duration-700"></div>
+                    <div className="absolute top-8 left-8 z-10"><span className="bg-black/50 backdrop-blur-md border border-white/10 px-4 py-2 text-[9px] uppercase tracking-[3px] text-white">{item.subtitle}</span></div>
+                    <div className="absolute bottom-0 left-0 w-full p-8 md:p-10 transform transition-transform duration-500 translate-y-8 group-hover:translate-y-0">
+                      <h4 className="text-white text-3xl font-bold uppercase tracking-[2px] font-serif mb-3">{item.title}</h4>
+                      <p className="font-sans text-gray-300 text-sm font-light leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">{item.desc}</p>
+                      <div className="w-0 h-[1px] bg-[#c5a059] mt-6 transition-all duration-700 ease-out group-hover:w-full"></div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="flex justify-center space-x-4 mt-10 md:hidden">
+            <button onClick={prevCollectionSlide} className="w-12 h-12 border border-white/20 rounded-full flex items-center justify-center text-white active:bg-white active:text-black transition-all"><ChevronLeft size={20} /></button>
+            <button onClick={nextCollectionSlide} className="w-12 h-12 border border-white/20 rounded-full flex items-center justify-center text-white active:bg-white active:text-black transition-all"><ChevronRight size={20} /></button>
+          </div>
+        </div>
+      </section>
+
+      {/* LATEST ARRIVALS */}
+      <section className="relative w-full py-32 bg-[#030303] overflow-hidden">
+        <div className="ambient-light bg-[#c5a059] w-[40vw] h-[40vw] top-0 left-[-20vw] parallax-layer" data-speed="0.2"></div>
+        <div className="max-w-[1400px] mx-auto px-6 relative z-10">
+          <div className="text-center mb-20 reveal-target">
+            <span className="text-[#c5a059] text-[11px] tracking-[4px] uppercase font-serif block mb-4">Latest Arrivals</span>
+            <h3 className="font-serif uppercase text-4xl md:text-5xl text-white font-bold tracking-[2px]">RECENT ACQUISITIONS</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {WATCH_DATABASE.slice(0, 4).map((product, index) => (
+              <div key={product.id} className={`group cursor-pointer flex flex-col bg-transparent p-4 transition-all duration-500 reveal-target delay-${(index % 4) * 100}`}>
+                <div className="relative aspect-[4/5] overflow-hidden bg-[#0a0a0a] mb-6 rounded-sm border border-white/5 group-hover:border-white/20 transition-colors">
+                  <img src={product.image} className="absolute inset-0 w-full h-full object-contain p-8 transition-all duration-700 opacity-100 group-hover:scale-110 ease-out" alt={product.title} />
+                  <div className="absolute top-4 left-4 flex flex-col gap-2 z-20"><span className="bg-white text-black text-[9px] font-bold px-3 py-1.5 uppercase tracking-[2px]">{product.tag}</span></div>
+                  <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10 backdrop-blur-sm">
+                    <button className="btn-gold !px-6 !py-3 !text-[10px]" onClick={() => addToCart(product)}>
+                      <span className="relative z-10 font-bold tracking-[2px]">ACQUIRE ASSET</span>
+                    </button>
+                  </div>
+                </div>
+                <div className="flex flex-col flex-grow text-center px-2">
+                  <span className="font-serif text-[10px] text-gray-500 uppercase tracking-[2px] mb-2 block">{product.specs.material}</span>
+                  <h4 className="font-mono text-[13px] leading-[1.6] text-gray-300 transition-colors duration-300 group-hover:text-white line-clamp-2 mb-4 font-light">{product.model}</h4>
+                  <p className="font-serif text-lg font-bold text-white mt-auto tracking-wide border-t border-white/10 pt-4">${product.price},000</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-20 reveal-target delay-200">
+            <button onClick={() => navigate('SHOP')} className="btn-gold group">
+              <span className="relative z-10 flex items-center">VIEW FULL INVENTORY <ArrowRight size={16} className="ml-3 transform group-hover:translate-x-1 transition-transform" /></span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* SOCIAL SHOWCASE */}
+      <section className="relative w-full py-32 bg-[#0a0a0a] overflow-hidden border-t border-white/5">
+        <div className="max-w-[1400px] mx-auto px-6 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 lg:gap-8 mb-24">
+            <div className="flex flex-col justify-center lg:pr-12 reveal-target">
+              <span className="text-[#c5a059] text-[11px] tracking-[4px] uppercase font-serif block mb-4">Digital Presence</span>
+              <h3 className="font-serif uppercase text-4xl text-white font-bold mb-8 tracking-[2px] leading-tight">HY ON SOCIAL</h3>
+              <div className="w-10 h-[1px] bg-white/20 mb-8"></div>
+              <p className="font-sans text-gray-400 leading-[1.8] mb-6 text-[15px] font-light">Follow <strong className="text-white font-medium">HY Watches</strong> across digital platforms for unboxing sequences, macro reviews, and arrival alerts.</p>
+              <p className="font-sans text-gray-400 leading-[1.8] text-[15px] font-light mb-8">Every piece is filmed raw, allowing you to observe finishing, proportions, and wrist presence.</p>
+            </div>
+            {socialMediaVideos.map((social, idx) => (
+              <div key={idx} className={`flex flex-col reveal-target delay-${(idx + 1) * 100}`}>
+                <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
+                  <span className="flex items-center text-white font-sans font-bold uppercase tracking-[2px] text-[11px]"><span className="mr-3 text-[#c5a059]">{social.icon}</span> {social.type}</span>
+                  <span className="text-gray-600 text-[10px] tracking-widest font-mono">@HYWATCHES</span>
+                </div>
+                <div className="relative aspect-[9/16] bg-[#030303] overflow-hidden group cursor-pointer shadow-[0_30px_60px_rgba(0,0,0,0.8)] rounded-sm border border-white/5">
+                  <video ref={el => videoRefs.current[idx + 1] = el} className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:scale-110 transition-transform duration-[2s] ease-out group-hover:opacity-100" preload="auto" playsInline autoPlay muted loop>
+                    <source src={social.videoSrc} type="video/mp4" />
+                  </video>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 opacity-100 group-hover:opacity-0 transition-opacity duration-500 pointer-events-none"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+export function ShopPage() {
+  const { addToCart } = useAppContext();
+  const [filter, setFilter] = useState('ALL');
+  const brands = ['ALL', 'Richard Mille', 'Rolex', 'Patek Philippe', 'Audemars Piguet', 'Hublot'];
+  const filteredWatches = filter === 'ALL' ? WATCH_DATABASE : WATCH_DATABASE.filter(w => w.brand === filter);
+
+  return (
+    <div className="w-full flex flex-col pt-[120px] bg-[#030303] min-h-screen">
+      <div className="max-w-[1600px] mx-auto w-full px-6 py-12 flex flex-col lg:flex-row gap-12">
+        <div className="w-full lg:w-[280px] flex-shrink-0 border-r border-white/5 pr-8 reveal-target">
+          <h2 className="font-serif uppercase text-2xl tracking-[2px] mb-8 pb-4 border-b border-white/10 flex items-center">INVENTORY</h2>
+          <div className="space-y-8">
+            <div>
+              <h3 className="text-xs uppercase tracking-[2px] text-gray-500 mb-4 font-bold">Manufacture</h3>
+              <ul className="space-y-3">
+                {brands.map(b => (
+                  <li key={b}>
+                    <button onClick={() => setFilter(b)} className={`text-[13px] uppercase tracking-[1px] font-light transition-colors flex items-center ${filter === b ? 'text-[#c5a059]' : 'text-gray-400 hover:text-white'}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full mr-3 ${filter === b ? 'bg-[#c5a059]' : 'bg-transparent border border-gray-600'}`}></span>
+                      {b}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-xs uppercase tracking-[2px] text-gray-500 mb-4 font-bold">Material Matrix</h3>
+              <ul className="space-y-3">
+                {['Carbon TPT', 'Grade 5 Titanium', 'Oystersteel', '18kt Gold', 'Ceramic'].map(m => (
+                  <li key={m} className="text-[13px] uppercase tracking-[1px] font-light text-gray-400 cursor-not-allowed opacity-50 flex items-center"><span className="w-1.5 h-1.5 rounded-full border border-gray-600 mr-3"></span>{m}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div className="flex-grow">
+          <div className="flex justify-between items-center mb-8 reveal-target">
+            <p className="text-sm text-gray-400 font-light uppercase tracking-[2px]">Displaying {filteredWatches.length} Assets</p>
+            <button className="text-xs text-white border border-white/20 px-4 py-2 uppercase tracking-[1px] hover:bg-white hover:text-black transition-colors">Sort: Acquisition Date</button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {filteredWatches.map((watch, i) => (
+              <div key={watch.id} className={`bg-[#0a0a0a] border border-white/5 p-5 group flex flex-col h-full reveal-target delay-${(i % 3) * 100}`}>
+                <div className="relative aspect-square bg-[#111] mb-6 overflow-hidden flex items-center justify-center">
+                  <img src={watch.image} className="w-[80%] h-[80%] object-contain transition-transform duration-700 group-hover:scale-110" />
+                  <div className="absolute top-3 left-3"><span className="bg-white text-black text-[9px] font-bold px-2 py-1 uppercase tracking-[2px]">{watch.tag}</span></div>
+                </div>
+                <div className="flex flex-col flex-grow">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="text-[#c5a059] text-[10px] tracking-[2px] uppercase font-serif">{watch.brand}</span>
+                    <span className="text-gray-500 text-[10px] tracking-[1px] uppercase border border-gray-700 px-1">{watch.specs.diameter}</span>
+                  </div>
+                  <h4 className="text-[13px] font-mono font-light text-gray-200 mb-3 line-clamp-2 leading-relaxed">{watch.model}</h4>
+                  <p className="text-[11px] text-gray-500 font-light mb-6 line-clamp-3">{watch.description}</p>
+                  <div className="mt-auto">
+                    <div className="flex justify-between items-center border-t border-white/10 pt-4 mb-4">
+                      <span className="font-serif font-bold text-xl text-white">${watch.price},000</span>
+                    </div>
+                    <button className="w-full border border-[#c5a059] text-[#c5a059] py-3 text-xs uppercase tracking-[2px] font-bold hover:bg-[#c5a059] hover:text-black transition-all" onClick={() => addToCart(watch)}>
+                      Acquire Asset
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function AboutPage() {
+  return (
+    <div className="w-full pt-[120px] bg-[#030303] text-white min-h-screen pb-32">
+      <div className="max-w-[1000px] mx-auto px-6 pt-20 text-center reveal-target">
+        <span className="text-[#c5a059] text-[11px] tracking-[4px] uppercase font-serif block mb-6">Our Legacy</span>
+        <h1 className="text-5xl md:text-7xl font-serif font-bold uppercase tracking-[4px] mb-12">The Zenith of<br/>Horology</h1>
+        <div className="w-[1px] h-24 bg-gradient-to-b from-[#c5a059] to-transparent mx-auto mb-12"></div>
+        <p className="text-lg md:text-xl text-gray-400 font-light leading-[2] tracking-wide text-left md:text-center">
+          Founded in Victoria, Australia, HY Systems was established with a singular directive: to provide unfiltered access to the world's most exclusive, technically profound, and aesthetically immaculate timepieces. We operate at the intersection of haute horlogerie and global logistics.
+        </p>
+      </div>
+      <div className="max-w-[1200px] mx-auto px-6 mt-32 grid grid-cols-1 md:grid-cols-2 gap-16 items-center reveal-target">
+        <div className="aspect-[4/5] bg-[#111] relative overflow-hidden glass-panel p-2">
+          <img src="https://lucytimepieces.com/wp-content/uploads/2026/03/richard-mille-rm-67-02-sebastien-ogier-carbon-tpt-2024-richard-mille-43740914483444.jpg" className="w-full h-full object-cover grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all duration-1000"/>
+        </div>
+        <div className="flex flex-col space-y-12">
+          <div>
+            <h3 className="text-[#c5a059] font-serif uppercase tracking-[3px] text-xl mb-4 border-b border-white/10 pb-4">01. Precision Sourcing</h3>
+            <p className="text-gray-400 font-light leading-[1.8] text-sm">Our global network of authorized dealers and private collectors allows us to bypass traditional waitlists, acquiring highly allocated references immediately upon client mandate.</p>
+          </div>
+          <div>
+            <h3 className="text-[#c5a059] font-serif uppercase tracking-[3px] text-xl mb-4 border-b border-white/10 pb-4">02. Micro-Mechanical Authentication</h3>
+            <p className="text-gray-400 font-light leading-[1.8] text-sm">Every acquisition undergoes a mandatory 48-hour diagnostic protocol. Master technicians verify escapement amplitude, water resistance margins, and case geometry integrity to guarantee absolute authenticity.</p>
+          </div>
+          <div>
+            <h3 className="text-[#c5a059] font-serif uppercase tracking-[3px] text-xl mb-4 border-b border-white/10 pb-4">03. Bespoke Customization</h3>
+            <p className="text-gray-400 font-light leading-[1.8] text-sm">For clients seeking unique expression, our CNC machining and gem-setting departments execute flawless aftermarket modifications utilizing VVS1 diamonds and proprietary carbon composite milling.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function ContactPage() {
+  const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitted(true);
+    setTimeout(() => setSubmitted(false), 5000);
+    setFormData({ name: '', email: '', subject: '', message: '' });
+  };
+
+  return (
+    <div className="w-full pt-[120px] bg-[#030303] text-white min-h-screen pb-32">
+      <div className="max-w-[1400px] mx-auto px-6 py-20">
+        <div className="text-center mb-20 reveal-target">
+          <span className="text-[#c5a059] text-[11px] tracking-[4px] uppercase font-serif block mb-4">Client Relations</span>
+          <h1 className="text-4xl md:text-6xl font-serif font-bold uppercase tracking-[2px]">SECURE COMMUNICATIONS</h1>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 bg-[#0a0a0a] border border-white/5 p-8 md:p-16 reveal-target">
+          <div className="lg:col-span-2 flex flex-col space-y-12 pr-0 lg:pr-12 border-b lg:border-b-0 lg:border-r border-white/10 pb-12 lg:pb-0">
+            <div>
+              <h3 className="font-serif uppercase tracking-[2px] text-xl mb-6 text-white flex items-center">Dispatch Headquarters</h3>
+              <p className="text-gray-400 font-light leading-relaxed text-sm">Boronia, Victoria<br/>Australia<br/><br/>(Visits strictly by private appointment only. Security protocols in effect.)</p>
+            </div>
+            <div>
+              <h3 className="font-serif uppercase tracking-[2px] text-xl mb-6 text-white flex items-center">Electronic Mail</h3>
+              <p className="text-gray-400 font-light text-sm"><a href="mailto:info.hywatches@gmail.com" className="hover:text-[#c5a059]">info.hywatches@gmail.com</a></p>
+            </div>
+            <div>
+              <h3 className="font-serif uppercase tracking-[2px] text-xl mb-6 text-white flex items-center">Encrypted Network</h3>
+              <p className="text-gray-400 font-light text-sm">WhatsApp / Telegram<br/><span className="text-[#c5a059]">+61 000 000 000</span></p>
+            </div>
+          </div>
+          <div className="lg:col-span-3">
+            {submitted ? (
+              <div className="h-full flex flex-col items-center justify-center text-center p-12 bg-[#111] border border-[#c5a059]/30">
+                <ShieldCheck size={64} className="text-[#c5a059] mb-6" />
+                <h3 className="font-serif text-2xl uppercase tracking-[2px] mb-4">Transmission Secured</h3>
+                <p className="text-gray-400 font-light text-sm">A senior broker will review your mandate and establish contact within 12 hours.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="flex flex-col space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="flex flex-col">
+                    <label className="text-[10px] uppercase tracking-[2px] text-gray-500 mb-2 font-bold">Designation</label>
+                    <input required type="text" className="bg-transparent border-b border-white/20 pb-3 text-sm text-white focus:outline-none focus:border-[#c5a059] transition-colors" placeholder="Full Name" value={formData.name} onChange={e=>setFormData({...formData, name: e.target.value})}/>
+                  </div>
+                  <div className="flex flex-col">
+                    <label className="text-[10px] uppercase tracking-[2px] text-gray-500 mb-2 font-bold">Return Address</label>
+                    <input required type="email" className="bg-transparent border-b border-white/20 pb-3 text-sm text-white focus:outline-none focus:border-[#c5a059] transition-colors" placeholder="Email Address" value={formData.email} onChange={e=>setFormData({...formData, email: e.target.value})}/>
+                  </div>
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-[10px] uppercase tracking-[2px] text-gray-500 mb-2 font-bold">Acquisition Subject</label>
+                  <select required className="bg-black border-b border-white/20 pb-3 text-sm text-gray-400 focus:outline-none focus:border-[#c5a059] transition-colors appearance-none" value={formData.subject} onChange={e=>setFormData({...formData, subject: e.target.value})}>
+                    <option value="" disabled>Select Inquiry Type</option>
+                    <option value="purchase">Acquire a Timepiece</option>
+                    <option value="sell">Sell/Trade a Timepiece</option>
+                    <option value="custom">Bespoke Customization</option>
+                    <option value="support">Logistics/Support</option>
+                  </select>
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-[10px] uppercase tracking-[2px] text-gray-500 mb-2 font-bold">Mandate Details</label>
+                  <textarea required rows={5} className="bg-transparent border-b border-white/20 pb-3 text-sm text-white focus:outline-none focus:border-[#c5a059] transition-colors resize-none" placeholder="Provide reference numbers, budget parameters, or specific requirements..." value={formData.message} onChange={e=>setFormData({...formData, message: e.target.value})}></textarea>
+                </div>
+                <button type="submit" className="btn-gold self-start mt-4"><span className="relative z-10 flex items-center">TRANSMIT DIRECTIVE <ArrowRight size={16} className="ml-3"/></span></button>
+              </form>
+            )}
+          </div>
+        </div>
+        <div className="mt-20 border border-white/5 p-8 bg-[#0a0a0a] flex items-start reveal-target">
+          <Shield size={24} className="text-[#c5a059] mr-6 flex-shrink-0 mt-1"/>
+          <div>
+            <h4 className="font-serif uppercase tracking-[2px] text-sm mb-2 text-white">Security Notice</h4>
+            <p className="text-xs text-gray-400 leading-[1.8] font-light max-w-[800px]">All communications regarding financial wire instructions are sent exclusively via our encrypted domains. HY Watches will never request payment via unsecured social media channels or text messages. Authenticate all routing parameters telephonically before initiating capital transfers.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function Layout() {
   const { currentRoute } = useAppContext();

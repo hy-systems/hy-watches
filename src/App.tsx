@@ -1,15 +1,12 @@
 import React, { useState, useEffect, createContext, useContext, ReactNode, useRef, Component, ErrorInfo } from 'react';
 import { 
-  Search, Globe, ShoppingBag, Menu, ChevronLeft, ChevronRight, 
+  Search, Globe, ShoppingBag, Menu, ChevronLeft, ChevronRight, ChevronDown,
   Star, Play, Package, CreditCard, ShieldCheck, X, Instagram, 
   Facebook, ArrowRight, ArrowUpRight, Watch, Clock, Shield,
-  Mail, MapPin, Phone, CheckCircle, AlertCircle, Filter,
+  Mail, MapPin, Phone, CheckCircle, AlertCircle, Filter, SlidersHorizontal,
   MessageCircle
 } from 'lucide-react';
 
-// ==========================================
-// ERROR BOUNDARY (CATCHES FATAL CRASHES)
-// ==========================================
 class ErrorBoundary extends Component<{children: ReactNode}, {hasError: boolean, error: Error | null}> {
   constructor(props: {children: ReactNode}) {
     super(props);
@@ -34,10 +31,6 @@ class ErrorBoundary extends Component<{children: ReactNode}, {hasError: boolean,
     return this.props.children;
   }
 }
-
-// ==========================================
-// DATA MAPPING & ASSETS
-// ==========================================
 
 const WATCH_DATABASE = [
   { id: 'RM-01', brand: 'Richard Mille', model: 'RM67-02 Black Carbon TPT "BLUE TIFFANY"', price: 4600, category: 'Carbon', description: 'Engineered for optimal performance on the wrist of elite athletes. The RM 67-02 weighs a mere 32 grams, utilizing TPT composite materials and a grade 5 titanium baseplate. The blue Tiffany accents provide a striking contrast against the dark carbon matrix.', specs: { material: 'Carbon TPT', movement: 'Automatic CRMA7', reserve: '50 Hours', waterResist: '30m', diameter: '38.7mm' }, image: 'https://lucytimepieces.com/wp-content/uploads/2026/07/14-247x247.png', images: ['https://lucytimepieces.com/wp-content/uploads/2026/07/14-247x247.png', 'https://lucytimepieces.com/wp-content/uploads/2026/07/14-247x247.png'], tag: 'LIMITED' },

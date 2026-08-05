@@ -7,10 +7,6 @@ import {
   MessageCircle
 } from 'lucide-react';
 
-// ==========================================
-// DATA MAPPING & ASSETS
-// ==========================================
-
 const WATCH_DATABASE = [
   { id: 'RM-01', brand: 'Richard Mille', model: 'RM67-02 Black Carbon TPT "BLUE TIFFANY"', price: 4600, category: 'Carbon', description: 'Engineered for optimal performance on the wrist of elite athletes. The RM 67-02 weighs a mere 32 grams, utilizing TPT composite materials and a grade 5 titanium baseplate. The blue Tiffany accents provide a striking contrast against the dark carbon matrix.', specs: { material: 'Carbon TPT', movement: 'Automatic CRMA7', reserve: '50 Hours', waterResist: '30m', diameter: '38.7mm' }, image: 'https://lucytimepieces.com/wp-content/uploads/2026/07/14-247x247.png', images: ['https://lucytimepieces.com/wp-content/uploads/2026/07/14-247x247.png', 'https://lucytimepieces.com/wp-content/uploads/2026/07/14-247x247.png'], tag: 'LIMITED' },
   { id: 'RM-02', brand: 'Richard Mille', model: 'RM67-02 Full Black Carbon TPT NEW 2026', price: 4600, category: 'Carbon', description: 'A stealth interpretation of the ultimate sports watch. The full black carbon construction absorbs light while showcasing the unique damascene patterns inherent to the TPT manufacturing process.', specs: { material: 'Carbon TPT', movement: 'Automatic CRMA7', reserve: '50 Hours', waterResist: '30m', diameter: '38.7mm' }, image: 'https://lucytimepieces.com/wp-content/uploads/2026/07/z8006286682919_f8b17d8de483fd6eea96a18109486c17-247x247.jpg', images: ['https://lucytimepieces.com/wp-content/uploads/2026/07/13-247x247.png', 'https://lucytimepieces.com/wp-content/uploads/2026/07/z8006286682919_f8b17d8de483fd6eea96a18109486c17-247x247.jpg'], tag: 'NEW' },
@@ -42,10 +38,6 @@ const socialMediaVideos = [
   { type: 'INSTAGRAM', icon: <Instagram size={16} strokeWidth={2.5} />, videoSrc: 'https://assets.mixkit.co/videos/preview/mixkit-close-up-of-a-luxury-watch-on-a-mans-wrist-4246-large.mp4', link: '#' },
   { type: 'FACEBOOK', icon: <Facebook size={16} strokeWidth={2.5} />, videoSrc: 'https://assets.mixkit.co/videos/preview/mixkit-man-putting-on-a-luxury-watch-4244-large.mp4', link: '#' }
 ];
-
-// ==========================================
-// GLOBAL STATE & CONTEXT
-// ==========================================
 
 interface CartItem {
   id: string;
@@ -85,7 +77,9 @@ function AppProvider({ children }: { children: ReactNode }) {
 
   const navigate = (route: string) => {
     setMobileMenuOpen(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
     setCurrentRoute(route);
   };
 
@@ -112,12 +106,9 @@ function AppProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// ==========================================
-// GLOBAL ANIMATION HOOKS
-// ==========================================
-
 export function useScrollReveal() {
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const observer = new IntersectionObserver((entries, obs) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -134,6 +125,7 @@ export function useScrollReveal() {
 
 export function useParallax() {
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const handleMouseMove = (e: MouseEvent) => {
       requestAnimationFrame(() => {
         const x = (e.clientX / window.innerWidth - 0.5) * 20;
@@ -148,10 +140,6 @@ export function useParallax() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 }
-
-// ==========================================
-// GLOBAL STYLESHEET
-// ==========================================
 
 const GlobalStyles = () => (
   <style dangerouslySetInnerHTML={{__html: `
@@ -204,16 +192,12 @@ const GlobalStyles = () => (
   `}} />
 );
 
-// ==========================================
-// PERSISTENT LAYOUT COMPONENTS
-// ==========================================
-
 export function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
   const dotRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (window.innerWidth < 1024) return;
+    if (typeof window === 'undefined' || window.innerWidth < 1024) return;
 
     const moveCursor = (e: MouseEvent) => {
       if (cursorRef.current && dotRef.current) {
@@ -237,7 +221,6 @@ export function CustomCursor() {
     };
 
     window.addEventListener('mousemove', moveCursor);
-    
     const interactiveElements = document.querySelectorAll('a, button, input, select, textarea, .cursor-pointer');
     interactiveElements.forEach(el => {
       el.addEventListener('mouseenter', handleHover);
@@ -255,14 +238,8 @@ export function CustomCursor() {
 
   return (
     <div className="hidden lg:block pointer-events-none z-[9999]">
-      <div 
-        ref={cursorRef} 
-        className="fixed top-0 left-0 w-8 h-8 rounded-full border border-white/30 mix-blend-difference transition-all duration-300 ease-out will-change-transform"
-      ></div>
-      <div 
-        ref={dotRef} 
-        className="fixed top-0 left-0 w-1 h-1 bg-[#c5a059] rounded-full mix-blend-difference will-change-transform"
-      ></div>
+      <div ref={cursorRef} className="fixed top-0 left-0 w-8 h-8 rounded-full border border-white/30 mix-blend-difference transition-all duration-300 ease-out will-change-transform"></div>
+      <div ref={dotRef} className="fixed top-0 left-0 w-1 h-1 bg-[#c5a059] rounded-full mix-blend-difference will-change-transform"></div>
     </div>
   );
 }
@@ -280,13 +257,11 @@ function Header() {
   return (
     <header className={`fixed top-0 left-0 w-full z-[100] transition-all duration-700 ease-in-out ${isScrolled ? 'h-[80px] bg-[#030303]/95 backdrop-blur-2xl shadow-2xl border-b border-white/5' : 'h-[120px] bg-gradient-to-b from-black/80 to-transparent'}`}>
       <div className="max-w-[1600px] mx-auto w-full h-full px-6 md:px-12 flex justify-between items-center">
-        
         <div className="flex-shrink-0 z-[110]">
           <a onClick={() => navigate('HOME')} className="cursor-pointer font-serif uppercase tracking-[6px] text-2xl font-bold text-white hover:text-[#c5a059] transition-colors flex items-center">
             HY WATCHES
           </a>
         </div>
-
         <nav className="hidden lg:flex absolute left-1/2 -translate-x-1/2 h-full z-[105]">
           <ul className="flex space-x-12 items-center h-full m-0 p-0">
             <li className="h-full flex items-center"><a onClick={() => navigate('SHOP')} className="nav-link">SHOP INVENTORY</a></li>
@@ -306,7 +281,6 @@ function Header() {
             <li className="h-full flex items-center"><a onClick={() => navigate('CONTACT')} className="nav-link">CLIENT RELATIONS</a></li>
           </ul>
         </nav>
-
         <div className="flex items-center space-x-6 z-[110]">
           <div className="hidden md:flex items-center space-x-6 border-r border-white/20 pr-6">
             <button onClick={() => navigate('SHOP')} className="text-white hover:text-[#c5a059] transition-colors"><Search size={18} /></button>
@@ -414,7 +388,6 @@ function Footer() {
     <footer className="w-full bg-[#000] pt-24 pb-8 border-t border-white/5 relative z-10">
       <div className="max-w-[1400px] mx-auto px-8">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 pb-16 border-b border-white/5">
-          
           <div className="md:col-span-4 pr-8">
             <span className="font-serif uppercase tracking-[6px] text-2xl font-bold text-white mb-6 block">HY WATCHES</span>
             <p className="text-gray-500 text-[13px] leading-[2] font-light mb-8">
@@ -425,7 +398,6 @@ function Footer() {
               <a className="w-10 h-10 rounded-sm bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-[#c5a059] hover:border-[#c5a059] transition-all cursor-pointer"><Facebook size={16} /></a>
             </div>
           </div>
-          
           <div className="md:col-span-2">
             <h3 className="font-sans uppercase tracking-[2px] text-[11px] font-bold mb-6 text-white/50">Services</h3>
             <ul className="space-y-4 text-[13px] font-light text-gray-400">
@@ -435,7 +407,6 @@ function Footer() {
               <li><a className="hover:text-white cursor-pointer transition-colors" onClick={() => navigate('TERMS')}>Terms of Service</a></li>
             </ul>
           </div>
-          
           <div className="md:col-span-2">
             <h3 className="font-sans uppercase tracking-[2px] text-[11px] font-bold mb-6 text-white/50">Explore</h3>
             <ul className="space-y-4 text-[13px] font-light text-gray-400">
@@ -444,7 +415,6 @@ function Footer() {
               <li><a className="hover:text-[#c5a059] cursor-pointer transition-colors" onClick={() => navigate('CONTACT')}>Contact</a></li>
             </ul>
           </div>
-          
           <div className="md:col-span-4">
             <div className="bg-[#0a0a0a] p-8 border border-white/5">
               <h3 className="font-serif uppercase tracking-[2px] text-sm font-bold mb-6 flex items-center">
@@ -455,7 +425,6 @@ function Footer() {
               <p className="text-[#c5a059] text-sm"><strong className="text-white">WhatsApp:</strong> +61 000 000 000</p>
             </div>
           </div>
-          
         </div>
         <div className="pt-8 flex flex-col md:flex-row justify-between items-center text-[10px] text-gray-600 uppercase tracking-[2px]">
           <p>© 2026 HY WATCHES™ BY HY SYSTEMS. ALL RIGHTS RESERVED.</p>
@@ -469,10 +438,6 @@ function Footer() {
   );
 }
 
-// ==========================================
-// MODALS
-// ==========================================
-
 export function ProductModal({ product, isOpen, onClose }: { product: any, isOpen: boolean, onClose: () => void }) {
   const { addToCart } = useAppContext();
   const [activeImage, setActiveImage] = useState(0);
@@ -480,13 +445,13 @@ export function ProductModal({ product, isOpen, onClose }: { product: any, isOpe
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && typeof document !== 'undefined') {
       document.body.style.overflow = 'hidden';
       setActiveImage(0);
-    } else {
+    } else if (typeof document !== 'undefined') {
       document.body.style.overflow = 'unset';
     }
-    return () => { document.body.style.overflow = 'unset'; };
+    return () => { if (typeof document !== 'undefined') document.body.style.overflow = 'unset'; };
   }, [isOpen]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -501,104 +466,58 @@ export function ProductModal({ product, isOpen, onClose }: { product: any, isOpe
   return (
     <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 md:p-6">
       <div className="absolute inset-0 bg-black/90 backdrop-blur-xl transition-opacity animate-[fadeIn_0.3s_ease-out]" onClick={onClose}></div>
-      
       <div className="relative w-full max-w-[1200px] max-h-[90vh] bg-[#050505] border border-white/10 shadow-[0_30px_60px_rgba(0,0,0,0.9)] flex flex-col md:flex-row overflow-hidden animate-[slideUp_0.4s_cubic-bezier(0.16,1,0.3,1)]">
-        
         <button onClick={onClose} className="absolute top-6 right-6 z-50 w-10 h-10 rounded-full bg-black/50 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-all backdrop-blur-md">
           <X size={20} />
         </button>
-
         <div className="w-full md:w-1/2 bg-[#0a0a0a] relative flex flex-col border-r border-white/5">
           <div className="absolute top-6 left-6 z-10 flex gap-2">
             <span className="bg-[#c5a059] text-black text-[10px] font-bold px-3 py-1.5 uppercase tracking-[2px] shadow-lg">{product.tag}</span>
             <span className="bg-white/10 backdrop-blur-md text-white border border-white/20 text-[10px] font-bold px-3 py-1.5 uppercase tracking-[2px]">In Stock</span>
           </div>
-          
-          <div 
-            className="relative flex-grow flex items-center justify-center p-12 cursor-crosshair overflow-hidden group"
-            onMouseEnter={() => setIsZoomed(true)}
-            onMouseLeave={() => setIsZoomed(false)}
-            onMouseMove={handleMouseMove}
-          >
-            <img 
-              src={product.images[activeImage] || product.image} 
-              alt={product.model} 
-              className={`w-full h-full object-contain transition-transform duration-300 ${isZoomed ? 'opacity-0' : 'opacity-100'}`}
-            />
+          <div className="relative flex-grow flex items-center justify-center p-12 cursor-crosshair overflow-hidden group" onMouseEnter={() => setIsZoomed(true)} onMouseLeave={() => setIsZoomed(false)} onMouseMove={handleMouseMove}>
+            <img src={(product.images && product.images[activeImage]) || product.image} alt={product.model} className={`w-full h-full object-contain transition-transform duration-300 ${isZoomed ? 'opacity-0' : 'opacity-100'}`} />
             {isZoomed && (
-              <div 
-                className="absolute inset-0 bg-no-repeat transition-opacity duration-300 opacity-100 z-20"
-                style={{
-                  backgroundImage: `url(${product.images[activeImage] || product.image})`,
-                  backgroundPosition: `${mousePos.x}% ${mousePos.y}%`,
-                  backgroundSize: '250%'
-                }}
-              />
+              <div className="absolute inset-0 bg-no-repeat transition-opacity duration-300 opacity-100 z-20" style={{ backgroundImage: `url(${(product.images && product.images[activeImage]) || product.image})`, backgroundPosition: `${mousePos.x}% ${mousePos.y}%`, backgroundSize: '250%' }} />
             )}
           </div>
-          
           <div className="flex p-6 gap-4 border-t border-white/5 bg-[#050505] overflow-x-auto">
             {(product.images || [product.image]).map((img: string, idx: number) => (
-              <button 
-                key={idx} 
-                onClick={() => setActiveImage(idx)}
-                className={`w-20 h-20 flex-shrink-0 border bg-[#111] transition-all p-2 ${activeImage === idx ? 'border-[#c5a059]' : 'border-white/10 hover:border-white/30'}`}
-              >
+              <button key={idx} onClick={() => setActiveImage(idx)} className={`w-20 h-20 flex-shrink-0 border bg-[#111] transition-all p-2 ${activeImage === idx ? 'border-[#c5a059]' : 'border-white/10 hover:border-white/30'}`}>
                 <img src={img} alt={`Thumbnail ${idx}`} className="w-full h-full object-contain" />
               </button>
             ))}
           </div>
         </div>
-
         <div className="w-full md:w-1/2 flex flex-col bg-[#050505] overflow-y-auto">
           <div className="p-8 md:p-12">
             <span className="text-[#c5a059] text-[11px] tracking-[4px] uppercase font-serif mb-3 block">{product.brand}</span>
             <h2 className="text-2xl md:text-3xl font-mono font-light text-white mb-6 leading-tight">{product.model}</h2>
-            
             <div className="flex items-center gap-4 mb-8">
               <span className="font-serif text-3xl font-bold text-white tracking-wide">${product.price},000</span>
               <div className="h-6 w-[1px] bg-white/20"></div>
-              <div className="flex items-center text-[#c5a059]">
-                {[1,2,3,4,5].map(s => <Star key={s} size={14} className="fill-current" />)}
-              </div>
+              <div className="flex items-center text-[#c5a059]">{[1,2,3,4,5].map(s => <Star key={s} size={14} className="fill-current" />)}</div>
             </div>
-
-            <p className="text-gray-400 font-light text-sm leading-[1.8] mb-10 pb-10 border-b border-white/10">
-              {product.description}
-            </p>
-
+            <p className="text-gray-400 font-light text-sm leading-[1.8] mb-10 pb-10 border-b border-white/10">{product.description}</p>
             <h3 className="font-serif uppercase tracking-[2px] text-xs font-bold text-white mb-6">Technical Specifications</h3>
             <div className="grid grid-cols-2 gap-y-6 gap-x-8 mb-12">
               <div className="flex flex-col border-l-2 border-[#c5a059] pl-4">
-                <span className="text-[10px] uppercase tracking-[2px] text-gray-500 mb-1">Material</span>
-                <span className="text-sm text-gray-200 font-light">{product.specs.material}</span>
+                <span className="text-[10px] uppercase tracking-[2px] text-gray-500 mb-1">Material</span><span className="text-sm text-gray-200 font-light">{product.specs?.material}</span>
               </div>
               <div className="flex flex-col border-l-2 border-[#c5a059] pl-4">
-                <span className="text-[10px] uppercase tracking-[2px] text-gray-500 mb-1">Caliber</span>
-                <span className="text-sm text-gray-200 font-light">{product.specs.movement}</span>
+                <span className="text-[10px] uppercase tracking-[2px] text-gray-500 mb-1">Caliber</span><span className="text-sm text-gray-200 font-light">{product.specs?.movement}</span>
               </div>
               <div className="flex flex-col border-l-2 border-[#c5a059] pl-4">
-                <span className="text-[10px] uppercase tracking-[2px] text-gray-500 mb-1">Dimensions</span>
-                <span className="text-sm text-gray-200 font-light">{product.specs.diameter}</span>
+                <span className="text-[10px] uppercase tracking-[2px] text-gray-500 mb-1">Dimensions</span><span className="text-sm text-gray-200 font-light">{product.specs?.diameter}</span>
               </div>
               <div className="flex flex-col border-l-2 border-[#c5a059] pl-4">
-                <span className="text-[10px] uppercase tracking-[2px] text-gray-500 mb-1">Resistance</span>
-                <span className="text-sm text-gray-200 font-light">{product.specs.waterResist}</span>
+                <span className="text-[10px] uppercase tracking-[2px] text-gray-500 mb-1">Resistance</span><span className="text-sm text-gray-200 font-light">{product.specs?.waterResist}</span>
               </div>
             </div>
-
             <div className="flex flex-col gap-4 mt-auto">
-              <button 
-                className="w-full bg-[#c5a059] text-black font-bold uppercase tracking-[3px] text-sm py-5 hover:bg-white transition-colors flex items-center justify-center group"
-                onClick={() => { addToCart(product); onClose(); }}
-              >
-                Acquire Asset 
-                <ArrowRight size={16} className="ml-3 transform group-hover:translate-x-1 transition-transform" />
+              <button className="w-full bg-[#c5a059] text-black font-bold uppercase tracking-[3px] text-sm py-5 hover:bg-white transition-colors flex items-center justify-center group" onClick={() => { addToCart(product); onClose(); }}>
+                Acquire Asset <ArrowRight size={16} className="ml-3 transform group-hover:translate-x-1 transition-transform" />
               </button>
-              <div className="flex justify-center items-center gap-6 mt-4 text-[10px] uppercase tracking-[2px] text-gray-500 font-bold">
-                <span className="flex items-center"><ShieldCheck size={14} className="mr-2 text-[#c5a059]" /> 2-Year Warranty</span>
-                <span className="flex items-center"><Globe size={14} className="mr-2 text-[#c5a059]" /> Global Shipping</span>
-              </div>
             </div>
           </div>
         </div>
@@ -614,9 +533,9 @@ export function SecureCheckout({ isOpen, onClose }: { isOpen: boolean, onClose: 
   const [orderComplete, setOrderComplete] = useState(false);
 
   useEffect(() => {
-    if (isOpen) document.body.style.overflow = 'hidden';
-    else document.body.style.overflow = 'unset';
-    return () => { document.body.style.overflow = 'unset'; };
+    if (isOpen && typeof document !== 'undefined') document.body.style.overflow = 'hidden';
+    else if (typeof document !== 'undefined') document.body.style.overflow = 'unset';
+    return () => { if (typeof document !== 'undefined') document.body.style.overflow = 'unset'; };
   }, [isOpen]);
 
   const handleProcess = () => {
@@ -638,20 +557,13 @@ export function SecureCheckout({ isOpen, onClose }: { isOpen: boolean, onClose: 
   return (
     <div className="fixed inset-0 z-[400] flex items-center justify-center">
       <div className="absolute inset-0 bg-black/95 backdrop-blur-2xl transition-opacity animate-[fadeIn_0.3s_ease-out]"></div>
-      
       <div className="relative w-full max-w-[1000px] h-[100dvh] md:h-[85vh] bg-[#050505] md:border border-white/10 md:shadow-2xl flex flex-col animate-[slideUp_0.5s_cubic-bezier(0.16,1,0.3,1)]">
-        
         <div className="flex justify-between items-center p-6 md:p-8 border-b border-white/10 bg-[#0a0a0a]">
           <span className="font-serif uppercase tracking-[4px] text-lg font-bold text-white flex items-center">
             <ShieldCheck size={20} className="text-[#c5a059] mr-3" /> Secure Gateway
           </span>
-          {!isProcessing && !orderComplete && (
-            <button onClick={closeAndReset} className="text-gray-400 hover:text-white transition-colors">
-              <X size={24} />
-            </button>
-          )}
+          {!isProcessing && !orderComplete && <button onClick={closeAndReset} className="text-gray-400 hover:text-white transition-colors"><X size={24} /></button>}
         </div>
-
         {orderComplete ? (
           <div className="flex-grow flex flex-col items-center justify-center p-8 text-center bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-blend-overlay">
             <div className="w-24 h-24 rounded-full border-2 border-[#c5a059] flex items-center justify-center mb-8 relative">
@@ -659,12 +571,8 @@ export function SecureCheckout({ isOpen, onClose }: { isOpen: boolean, onClose: 
               <CheckCircle size={40} className="text-[#c5a059]" />
             </div>
             <h2 className="font-serif text-3xl md:text-5xl uppercase tracking-[4px] mb-4 text-white font-bold">Acquisition Secured</h2>
-            <p className="text-gray-400 font-light text-sm md:text-base max-w-[500px] mb-12 leading-relaxed">
-              Your mandate has been successfully logged. An acquisition specialist will contact your registered coordinates within 2 hours to finalize logistics.
-            </p>
-            <button className="btn-gold" onClick={() => { closeAndReset(); setCartOpen(false); }}>
-              <span className="relative z-10 text-xs">RETURN TO INVENTORY</span>
-            </button>
+            <p className="text-gray-400 font-light text-sm md:text-base max-w-[500px] mb-12 leading-relaxed">Your mandate has been successfully logged. An acquisition specialist will contact your registered coordinates within 2 hours to finalize logistics.</p>
+            <button className="btn-gold" onClick={() => { closeAndReset(); setCartOpen(false); }}><span className="relative z-10 text-xs">RETURN TO INVENTORY</span></button>
           </div>
         ) : (
           <div className="flex flex-col md:flex-row flex-grow overflow-hidden">
@@ -673,12 +581,9 @@ export function SecureCheckout({ isOpen, onClose }: { isOpen: boolean, onClose: 
                 <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-[1px] bg-white/10 z-0"></div>
                 <div className="absolute left-0 top-1/2 -translate-y-1/2 h-[1px] bg-[#c5a059] z-0 transition-all duration-500" style={{ width: step === 1 ? '0%' : step === 2 ? '50%' : '100%' }}></div>
                 {[1, 2, 3].map((num) => (
-                  <div key={num} className={`relative z-10 w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold transition-colors duration-300 ${step >= num ? 'bg-[#c5a059] text-black border-[#c5a059]' : 'bg-[#111] text-gray-500 border border-white/20'}`}>
-                    {num}
-                  </div>
+                  <div key={num} className={`relative z-10 w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold transition-colors duration-300 ${step >= num ? 'bg-[#c5a059] text-black border-[#c5a059]' : 'bg-[#111] text-gray-500 border border-white/20'}`}>{num}</div>
                 ))}
               </div>
-
               {step === 1 && (
                 <div className="animate-[fadeIn_0.5s_ease-out]">
                   <h3 className="font-serif uppercase tracking-[2px] text-xl text-white mb-8 border-l-4 border-[#c5a059] pl-4">1. Client Identification</h3>
@@ -691,7 +596,6 @@ export function SecureCheckout({ isOpen, onClose }: { isOpen: boolean, onClose: 
                   <button className="btn-gold w-full" onClick={() => setStep(2)}><span className="relative z-10 text-xs">PROCEED TO LOGISTICS</span></button>
                 </div>
               )}
-
               {step === 2 && (
                 <div className="animate-[fadeIn_0.5s_ease-out]">
                   <h3 className="font-serif uppercase tracking-[2px] text-xl text-white mb-8 border-l-4 border-[#c5a059] pl-4">2. Secure Logistics</h3>
@@ -707,8 +611,6 @@ export function SecureCheckout({ isOpen, onClose }: { isOpen: boolean, onClose: 
                       <option>United States</option>
                       <option>United Kingdom</option>
                       <option>United Arab Emirates</option>
-                      <option>Singapore</option>
-                      <option>Switzerland</option>
                     </select>
                   </div>
                   <div className="flex gap-4">
@@ -717,49 +619,29 @@ export function SecureCheckout({ isOpen, onClose }: { isOpen: boolean, onClose: 
                   </div>
                 </div>
               )}
-
               {step === 3 && (
                 <div className="animate-[fadeIn_0.5s_ease-out]">
                   <h3 className="font-serif uppercase tracking-[2px] text-xl text-white mb-8 border-l-4 border-[#c5a059] pl-4">3. Capital Transfer</h3>
                   <div className="space-y-4 mb-10">
                     <label className="flex items-center p-4 border border-[#c5a059] bg-[#c5a059]/10 cursor-pointer">
-                      <div className="w-4 h-4 rounded-full border border-[#c5a059] flex items-center justify-center mr-4">
-                        <div className="w-2 h-2 bg-[#c5a059] rounded-full"></div>
-                      </div>
+                      <div className="w-4 h-4 rounded-full border border-[#c5a059] flex items-center justify-center mr-4"><div className="w-2 h-2 bg-[#c5a059] rounded-full"></div></div>
                       <span className="font-serif uppercase tracking-[2px] text-sm text-white flex-grow">Bank Wire Transfer</span>
                       <span className="text-[10px] text-[#c5a059] tracking-[1px] uppercase font-bold">-0% Fee</span>
                     </label>
-                    <label className="flex items-center p-4 border border-white/10 bg-[#111] cursor-pointer hover:border-white/30 transition-colors opacity-50">
-                      <div className="w-4 h-4 rounded-full border border-gray-600 mr-4"></div>
-                      <span className="font-serif uppercase tracking-[2px] text-sm text-white flex-grow">Cryptocurrency (USDT/BTC)</span>
-                      <span className="text-[10px] text-gray-500 tracking-[1px] uppercase">Coming Soon</span>
-                    </label>
-                  </div>
-                  <div className="bg-[#0a0a0a] border border-white/5 p-6 mb-10">
-                    <p className="text-xs text-gray-400 font-light leading-relaxed">
-                      By initiating this transfer, you mandate HY Watches to lock the requested inventory for 24 hours pending wire confirmation. Irrevocable payment routing details will be generated securely upon initiation.
-                    </p>
                   </div>
                   <div className="flex gap-4">
                     <button className="w-1/3 border border-white/20 text-white hover:bg-white/5 uppercase tracking-[2px] text-xs font-bold transition-colors" onClick={() => setStep(2)} disabled={isProcessing}>Back</button>
-                    <button className="btn-gold w-2/3" onClick={handleProcess} disabled={isProcessing}>
-                      <span className="relative z-10 flex items-center text-xs">
-                        {isProcessing ? 'ESTABLISHING SECURE LINK...' : 'INITIATE PROTOCOL'}
-                      </span>
-                    </button>
+                    <button className="btn-gold w-2/3" onClick={handleProcess} disabled={isProcessing}><span className="relative z-10 flex items-center text-xs">{isProcessing ? 'ESTABLISHING LINK...' : 'INITIATE PROTOCOL'}</span></button>
                   </div>
                 </div>
               )}
             </div>
-
             <div className="w-full md:w-2/5 bg-[#0a0a0a] border-l border-white/5 flex flex-col p-6 md:p-12">
               <h3 className="font-serif uppercase tracking-[2px] text-sm text-gray-500 mb-8 font-bold">Acquisition Ledger</h3>
               <div className="flex-grow overflow-y-auto space-y-6 mb-8 pr-2">
                 {cartItems.map((item, idx) => (
                   <div key={idx} className="flex gap-4 items-start">
-                    <div className="w-16 h-16 bg-[#111] border border-white/5 flex-shrink-0 flex items-center justify-center p-2">
-                      <img src={item.image || (item.images && item.images[0])} className="w-full h-full object-contain" alt="" />
-                    </div>
+                    <div className="w-16 h-16 bg-[#111] border border-white/5 flex-shrink-0 flex items-center justify-center p-2"><img src={item.image || (item.images && item.images[0])} className="w-full h-full object-contain" alt="" /></div>
                     <div>
                       <p className="text-[9px] text-[#c5a059] tracking-[2px] uppercase font-serif mb-1">{item.brand}</p>
                       <p className="text-xs font-mono text-gray-300 line-clamp-2 leading-snug mb-2">{item.model}</p>
@@ -769,18 +651,7 @@ export function SecureCheckout({ isOpen, onClose }: { isOpen: boolean, onClose: 
                 ))}
               </div>
               <div className="border-t border-white/10 pt-6 space-y-4">
-                <div className="flex justify-between text-xs text-gray-400 uppercase tracking-[1px]">
-                  <span>Subtotal</span>
-                  <span>${cartTotal},000</span>
-                </div>
-                <div className="flex justify-between text-xs text-gray-400 uppercase tracking-[1px]">
-                  <span>Priority Logistics</span>
-                  <span className="text-[#c5a059]">Complimentary</span>
-                </div>
-                <div className="flex justify-between text-xs text-gray-400 uppercase tracking-[1px]">
-                  <span>Insurance Escrow</span>
-                  <span className="text-[#c5a059]">Covered</span>
-                </div>
+                <div className="flex justify-between text-xs text-gray-400 uppercase tracking-[1px]"><span>Subtotal</span><span>${cartTotal},000</span></div>
                 <div className="border-t border-white/10 pt-4 flex justify-between items-center mt-4">
                   <span className="font-serif uppercase tracking-[2px] text-sm text-white">Total Commitment</span>
                   <span className="font-serif text-2xl font-bold text-white">${cartTotal},000</span>
@@ -794,21 +665,22 @@ export function SecureCheckout({ isOpen, onClose }: { isOpen: boolean, onClose: 
   );
 }
 
-// ==========================================
-// PAGES
-// ==========================================
-
 export function HomePage() {
   const { navigate } = useAppContext();
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const [activeCollectionSlide, setActiveCollectionSlide] = useState(0);
+  const [itemsPerView, setItemsPerView] = useState(3);
   useScrollReveal();
   useParallax();
 
   useEffect(() => {
-    videoRefs.current.forEach(video => {
-      if (video) video.play().catch(() => {});
-    });
+    videoRefs.current.forEach(video => { if (video) video.play().catch(() => {}); });
+    const updateView = () => setItemsPerView(window.innerWidth < 768 ? 1 : 3);
+    if (typeof window !== 'undefined') {
+      updateView();
+      window.addEventListener('resize', updateView);
+      return () => window.removeEventListener('resize', updateView);
+    }
   }, []);
 
   const nextCollectionSlide = () => setActiveCollectionSlide((prev) => (prev + 1) % popularCollections.length);
@@ -837,44 +709,10 @@ export function HomePage() {
             Discover the pinnacle of horological engineering. Perfectly customized, authenticated, and delivered with uncompromising precision.
           </p>
           <div className="reveal-target delay-300">
-            <button onClick={() => navigate('SHOP')} className="btn-gold group">
-              <span className="relative z-10 flex items-center">EXPLORE THE VAULT <ArrowRight size={16} className="ml-3 transform group-hover:translate-x-1 transition-transform" /></span>
-            </button>
+            <button onClick={() => navigate('SHOP')} className="btn-gold group"><span className="relative z-10 flex items-center">EXPLORE THE VAULT <ArrowRight size={16} className="ml-3 transform group-hover:translate-x-1 transition-transform" /></span></button>
           </div>
         </div>
       </div>
-
-      <div className="relative w-full bg-[#0a0a0a] py-4 border-b border-white/5 z-20">
-        <div className="max-w-[1400px] mx-auto px-6 flex justify-center md:justify-between items-center">
-          <p className="text-gray-400 text-[10px] md:text-[11px] tracking-[3px] uppercase font-sans flex items-center">
-            <Shield size={14} className="text-[#c5a059] mr-2" />
-            100% Authenticity Guaranteed
-          </p>
-          <p className="text-gray-400 text-[10px] md:text-[11px] tracking-[3px] uppercase font-sans hidden md:flex items-center">
-            <Globe size={14} className="text-[#c5a059] mr-2" />
-            Worldwide Secured Shipping
-          </p>
-          <p className="text-[#c5a059] text-[10px] md:text-[11px] tracking-[3px] uppercase font-sans hidden lg:flex items-center font-bold">
-            Complimentary Travel Case With Order
-          </p>
-        </div>
-      </div>
-
-      <section className="relative w-full py-32 px-6 bg-[#030303] overflow-hidden">
-        <div className="ambient-light bg-white/5 w-[50vw] h-[50vw] bottom-0 right-0 parallax-layer" data-speed="-0.3"></div>
-        <div className="max-w-[1000px] mx-auto text-center flex flex-col items-center relative z-10">
-          <div className="w-12 h-12 border border-[#c5a059] rounded-full flex items-center justify-center mb-10 reveal-target">
-            <div className="w-2 h-2 bg-[#c5a059] rounded-full"></div>
-          </div>
-          <h2 className="uppercase font-serif text-3xl md:text-5xl lg:text-6xl mb-10 tracking-[2px] font-light text-white leading-tight reveal-target delay-100">
-            Elevating the standard of <br/><span className="font-bold text-gradient-gold">Bespoke Horology</span>
-          </h2>
-          <p className="font-sans text-gray-400 text-base md:text-xl leading-[2] tracking-wide font-light max-w-[800px] reveal-target delay-200">
-            HY Watches provides perfectly customized timepieces tailored to the exact specifications of the modern connoisseur. Beyond customization, we source, appraise, and procure genuine luxury items across the globe.
-          </p>
-        </div>
-      </section>
-
       <section className="relative w-full py-32 bg-[#0a0a0a] border-t border-white/5">
         <div className="max-w-[1600px] mx-auto px-6 md:px-12">
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 reveal-target">
@@ -883,12 +721,12 @@ export function HomePage() {
               <h3 className="font-serif uppercase text-4xl md:text-5xl text-white font-bold tracking-[2px]">FEATURED SERIES</h3>
             </div>
             <div className="hidden md:flex space-x-4">
-              <button onClick={prevCollectionSlide} className="w-14 h-14 border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-white hover:text-black hover:border-[#c5a059] transition-all"><ChevronLeft size={20} /></button>
-              <button onClick={nextCollectionSlide} className="w-14 h-14 border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-white hover:text-black hover:border-[#c5a059] transition-all"><ChevronRight size={20} /></button>
+              <button onClick={prevCollectionSlide} className="w-14 h-14 border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-[#c5a059] hover:text-black hover:border-[#c5a059] transition-all"><ChevronLeft size={20} /></button>
+              <button onClick={nextCollectionSlide} className="w-14 h-14 border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-[#c5a059] hover:text-black hover:border-[#c5a059] transition-all"><ChevronRight size={20} /></button>
             </div>
           </div>
           <div className="relative overflow-hidden w-full reveal-target delay-200">
-            <div className="flex transition-transform duration-1000 ease-[cubic-bezier(0.25,1,0.5,1)]" style={{ transform: `translateX(-${activeCollectionSlide * (100 / (window.innerWidth < 768 ? 1 : 3))}%)` }}>
+            <div className="flex transition-transform duration-1000 ease-[cubic-bezier(0.25,1,0.5,1)]" style={{ transform: `translateX(-${activeCollectionSlide * (100 / itemsPerView)}%)` }}>
               {popularCollections.map((item) => (
                 <div key={item.id} className="w-full md:w-1/3 flex-shrink-0 px-3">
                   <div className="relative group cursor-pointer overflow-hidden bg-[#111] h-[500px] md:h-[650px] rounded-sm shimmer-card">
@@ -907,9 +745,7 @@ export function HomePage() {
           </div>
         </div>
       </section>
-
       <section className="relative w-full py-32 bg-[#030303] overflow-hidden">
-        <div className="ambient-light bg-[#c5a059] w-[40vw] h-[40vw] top-0 left-[-20vw] parallax-layer" data-speed="0.2"></div>
         <div className="max-w-[1400px] mx-auto px-6 relative z-10">
           <div className="text-center mb-20 reveal-target">
             <span className="text-[#c5a059] text-[11px] tracking-[4px] uppercase font-serif block mb-4">Latest Arrivals</span>
@@ -922,10 +758,7 @@ export function HomePage() {
                   <img src={product.image} className="absolute inset-0 w-full h-full object-contain p-8 transition-all duration-700 opacity-100 group-hover:opacity-0 group-hover:scale-110 ease-out" alt={product.title} />
                   <img src={product.images?.[1] || product.image} className="absolute inset-0 w-full h-full object-cover opacity-0 transition-all duration-700 group-hover:opacity-100 scale-100 group-hover:scale-105 ease-out" alt={`${product.title} alt`} />
                   <div className="absolute top-4 left-4 flex flex-col gap-2 z-20"><span className="bg-white text-black text-[9px] font-bold px-3 py-1.5 uppercase tracking-[2px]">{product.tag}</span></div>
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10 backdrop-blur-sm" onClick={() => {
-                      const event = new CustomEvent('openProductModal', { detail: product });
-                      window.dispatchEvent(event);
-                  }}>
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10 backdrop-blur-sm" onClick={() => { const event = new CustomEvent('openProductModal', { detail: product }); window.dispatchEvent(event); }}>
                     <div className="transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 flex flex-col items-center">
                       <span className="w-12 h-12 rounded-full border border-white flex items-center justify-center text-white mb-3 hover:bg-white hover:text-black transition-colors"><Search size={16} /></span>
                       <span className="font-serif text-xs uppercase tracking-[2px] text-white font-medium">Quick View</span>
@@ -941,20 +774,16 @@ export function HomePage() {
             ))}
           </div>
           <div className="text-center mt-20 reveal-target delay-200">
-            <button onClick={() => navigate('SHOP')} className="btn-gold group">
-              <span className="relative z-10 flex items-center">VIEW FULL INVENTORY <ArrowRight size={16} className="ml-3 transform group-hover:translate-x-1 transition-transform" /></span>
-            </button>
+            <button onClick={() => navigate('SHOP')} className="btn-gold group"><span className="relative z-10 flex items-center">VIEW FULL INVENTORY <ArrowRight size={16} className="ml-3 transform group-hover:translate-x-1 transition-transform" /></span></button>
           </div>
         </div>
       </section>
-
       <section className="relative w-full py-32 bg-[#0a0a0a]">
         <div className="max-w-[1600px] mx-auto px-6 md:px-12">
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 reveal-target">
             <div className="max-w-[600px]">
               <span className="text-[#c5a059] text-[11px] tracking-[4px] uppercase font-serif block mb-4">Brand Portfolio</span>
               <h3 className="font-serif uppercase text-4xl md:text-5xl text-white font-bold tracking-[2px] mb-6">MANUFACTURES</h3>
-              <p className="font-sans text-gray-400 font-light leading-relaxed">Partnering exclusively with the world's most prestigious horological houses. Each brand represents a unique philosophy in watchmaking history.</p>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-4 h-auto md:h-[800px] reveal-target delay-200">
@@ -965,38 +794,6 @@ export function HomePage() {
                 <div className="absolute bottom-10 left-10 right-10 z-10 flex flex-col items-start transform transition-transform duration-500">
                   <span className="text-[#c5a059] text-[10px] md:text-[11px] tracking-[3px] uppercase mb-2 font-sans font-bold">{item.subtitle}</span>
                   <h2 className="font-serif text-white uppercase text-2xl md:text-3xl font-bold tracking-[3px] leading-tight">{item.title}</h2>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="relative w-full py-32 bg-[#030303] overflow-hidden">
-        <div className="ambient-light bg-white/5 w-[50vw] h-[50vw] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 parallax-layer" data-speed="0.1"></div>
-        <div className="max-w-[1400px] mx-auto px-6 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 lg:gap-8 mb-24">
-            <div className="flex flex-col justify-center lg:pr-12 reveal-target">
-              <span className="text-[#c5a059] text-[11px] tracking-[4px] uppercase font-serif block mb-4">Digital Presence</span>
-              <h3 className="font-serif uppercase text-4xl text-white font-bold mb-8 tracking-[2px] leading-tight">HY ON SOCIAL</h3>
-              <div className="w-10 h-[1px] bg-white/20 mb-8"></div>
-              <p className="font-sans text-gray-400 leading-[1.8] mb-6 text-[15px] font-light">Follow <strong className="text-white font-medium">HY Watches</strong> across digital platforms for unboxing sequences, macro reviews, and arrival alerts.</p>
-            </div>
-            {socialMediaVideos.map((social, idx) => (
-              <div key={idx} className={`flex flex-col reveal-target delay-${(idx + 1) * 100}`}>
-                <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
-                  <span className="flex items-center text-white font-sans font-bold uppercase tracking-[2px] text-[11px]"><span className="mr-3 text-[#c5a059]">{social.icon}</span> {social.type}</span>
-                  <span className="text-gray-600 text-[10px] tracking-widest font-mono">@HYWATCHES</span>
-                </div>
-                <div className="relative aspect-[9/16] bg-[#030303] overflow-hidden group cursor-pointer shadow-[0_30px_60px_rgba(0,0,0,0.8)] rounded-sm border border-white/5">
-                  <video ref={el => videoRefs.current[idx + 1] = el} className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:scale-110 transition-transform duration-[2s] ease-out group-hover:opacity-100" preload="auto" playsInline autoPlay muted loop>
-                    <source src={social.videoSrc} type="video/mp4" />
-                  </video>
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="w-16 h-16 rounded-full border border-white/20 flex items-center justify-center text-white glass-panel group-hover:bg-[#c5a059] group-hover:text-black transition-all transform group-hover:scale-110 shadow-2xl">
-                      <Play size={20} className="ml-1 fill-current" />
-                    </div>
-                  </div>
                 </div>
               </div>
             ))}
@@ -1018,28 +815,13 @@ export function ShopPage() {
     <div className="w-full flex flex-col pt-[120px] bg-[#030303] min-h-screen">
       <div className="max-w-[1600px] mx-auto w-full px-6 py-12 flex flex-col lg:flex-row gap-12">
         <div className="w-full lg:w-[280px] flex-shrink-0 border-r border-white/5 pr-8 reveal-target">
-          <h2 className="font-serif uppercase text-2xl tracking-[2px] mb-8 pb-4 border-b border-white/10 flex items-center">
-            <SlidersHorizontal size={18} className="mr-3 text-[#c5a059]"/> INVENTORY
-          </h2>
+          <h2 className="font-serif uppercase text-2xl tracking-[2px] mb-8 pb-4 border-b border-white/10 flex items-center"><SlidersHorizontal size={18} className="mr-3 text-[#c5a059]"/> INVENTORY</h2>
           <div className="space-y-8">
             <div>
               <h3 className="text-xs uppercase tracking-[2px] text-gray-500 mb-4 font-bold">Manufacture</h3>
               <ul className="space-y-3">
                 {brands.map(b => (
-                  <li key={b}>
-                    <button onClick={() => setFilter(b)} className={`text-[13px] uppercase tracking-[1px] font-light transition-colors flex items-center ${filter === b ? 'text-[#c5a059]' : 'text-gray-400 hover:text-white'}`}>
-                      <span className={`w-1.5 h-1.5 rounded-full mr-3 ${filter === b ? 'bg-[#c5a059]' : 'bg-transparent border border-gray-600'}`}></span>
-                      {b}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-xs uppercase tracking-[2px] text-gray-500 mb-4 font-bold">Material Matrix</h3>
-              <ul className="space-y-3">
-                {['Carbon TPT', 'Grade 5 Titanium', 'Oystersteel', '18kt Gold', 'Ceramic'].map(m => (
-                  <li key={m} className="text-[13px] uppercase tracking-[1px] font-light text-gray-400 cursor-not-allowed opacity-50 flex items-center"><span className="w-1.5 h-1.5 rounded-full border border-gray-600 mr-3"></span>{m}</li>
+                  <li key={b}><button onClick={() => setFilter(b)} className={`text-[13px] uppercase tracking-[1px] font-light transition-colors flex items-center ${filter === b ? 'text-[#c5a059]' : 'text-gray-400 hover:text-white'}`}><span className={`w-1.5 h-1.5 rounded-full mr-3 ${filter === b ? 'bg-[#c5a059]' : 'bg-transparent border border-gray-600'}`}></span>{b}</button></li>
                 ))}
               </ul>
             </div>
@@ -1048,38 +830,22 @@ export function ShopPage() {
         <div className="flex-grow">
           <div className="flex justify-between items-center mb-8 reveal-target">
             <p className="text-sm text-gray-400 font-light uppercase tracking-[2px]">Displaying {filteredWatches.length} Assets</p>
-            <button className="text-xs text-white border border-white/20 px-4 py-2 uppercase tracking-[1px] hover:bg-white hover:text-black transition-colors">Sort: Acquisition Date</button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {filteredWatches.map((watch, i) => (
               <div key={watch.id} className={`bg-[#0a0a0a] border border-white/5 p-5 group flex flex-col h-full reveal-target delay-${(i % 3) * 100}`}>
-                <div 
-                  className="relative aspect-square bg-[#111] mb-6 overflow-hidden flex items-center justify-center cursor-pointer"
-                  onClick={() => {
-                    const event = new CustomEvent('openProductModal', { detail: watch });
-                    window.dispatchEvent(event);
-                  }}
-                >
+                <div className="relative aspect-square bg-[#111] mb-6 overflow-hidden flex items-center justify-center cursor-pointer" onClick={() => { const event = new CustomEvent('openProductModal', { detail: watch }); window.dispatchEvent(event); }}>
                   <img src={watch.image} className="w-[80%] h-[80%] object-contain transition-transform duration-700 group-hover:scale-110" />
                   <div className="absolute top-3 left-3"><span className="bg-white text-black text-[9px] font-bold px-2 py-1 uppercase tracking-[2px]">{watch.tag}</span></div>
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <span className="w-12 h-12 rounded-full border border-white flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors"><Search size={16} /></span>
-                  </div>
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"><span className="w-12 h-12 rounded-full border border-white flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors"><Search size={16} /></span></div>
                 </div>
                 <div className="flex flex-col flex-grow">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="text-[#c5a059] text-[10px] tracking-[2px] uppercase font-serif">{watch.brand}</span>
-                    <span className="text-gray-500 text-[10px] tracking-[1px] uppercase border border-gray-700 px-1">{watch.specs.diameter}</span>
-                  </div>
+                  <div className="flex justify-between items-start mb-2"><span className="text-[#c5a059] text-[10px] tracking-[2px] uppercase font-serif">{watch.brand}</span><span className="text-gray-500 text-[10px] tracking-[1px] uppercase border border-gray-700 px-1">{watch.specs.diameter}</span></div>
                   <h4 className="text-[13px] font-mono font-light text-gray-200 mb-3 line-clamp-2 leading-relaxed">{watch.model}</h4>
                   <p className="text-[11px] text-gray-500 font-light mb-6 line-clamp-3">{watch.description}</p>
                   <div className="mt-auto">
-                    <div className="flex justify-between items-center border-t border-white/10 pt-4 mb-4">
-                      <span className="font-serif font-bold text-xl text-white">${watch.price},000</span>
-                    </div>
-                    <button className="w-full border border-[#c5a059] text-[#c5a059] py-3 text-xs uppercase tracking-[2px] font-bold hover:bg-[#c5a059] hover:text-black transition-all" onClick={() => addToCart(watch)}>
-                      Acquire Asset
-                    </button>
+                    <div className="flex justify-between items-center border-t border-white/10 pt-4 mb-4"><span className="font-serif font-bold text-xl text-white">${watch.price},000</span></div>
+                    <button className="w-full border border-[#c5a059] text-[#c5a059] py-3 text-xs uppercase tracking-[2px] font-bold hover:bg-[#c5a059] hover:text-black transition-all" onClick={() => addToCart(watch)}>Acquire Asset</button>
                   </div>
                 </div>
               </div>
@@ -1100,9 +866,6 @@ export function AboutPage() {
         <span className="text-[#c5a059] text-[11px] tracking-[4px] uppercase font-serif block mb-6">Our Legacy</span>
         <h1 className="text-5xl md:text-7xl font-serif font-bold uppercase tracking-[4px] mb-12">The Zenith of<br/>Horology</h1>
         <div className="w-[1px] h-24 bg-gradient-to-b from-[#c5a059] to-transparent mx-auto mb-12"></div>
-        <p className="text-lg md:text-xl text-gray-400 font-light leading-[2] tracking-wide text-left md:text-center">
-          Founded in Victoria, Australia, HY Systems was established with a singular directive: to provide unfiltered access to the world's most exclusive, technically profound, and aesthetically immaculate timepieces. We operate at the intersection of haute horlogerie and global logistics.
-        </p>
       </div>
       <div className="max-w-[1200px] mx-auto px-6 mt-32 grid grid-cols-1 md:grid-cols-2 gap-16 items-center reveal-target">
         <div className="aspect-[4/5] bg-[#111] relative overflow-hidden glass-panel p-2">
@@ -1116,10 +879,6 @@ export function AboutPage() {
           <div>
             <h3 className="text-[#c5a059] font-serif uppercase tracking-[3px] text-xl mb-4 border-b border-white/10 pb-4">02. Micro-Mechanical Authentication</h3>
             <p className="text-gray-400 font-light leading-[1.8] text-sm">Every acquisition undergoes a mandatory 48-hour diagnostic protocol. Master technicians verify escapement amplitude, water resistance margins, and case geometry integrity to guarantee absolute authenticity.</p>
-          </div>
-          <div>
-            <h3 className="text-[#c5a059] font-serif uppercase tracking-[3px] text-xl mb-4 border-b border-white/10 pb-4">03. Bespoke Customization</h3>
-            <p className="text-gray-400 font-light leading-[1.8] text-sm">For clients seeking unique expression, our CNC machining and gem-setting departments execute flawless aftermarket modifications utilizing VVS1 diamonds and proprietary carbon composite milling.</p>
           </div>
         </div>
       </div>
@@ -1148,62 +907,25 @@ export function ContactPage() {
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 bg-[#0a0a0a] border border-white/5 p-8 md:p-16 reveal-target">
           <div className="lg:col-span-2 flex flex-col space-y-12 pr-0 lg:pr-12 border-b lg:border-b-0 lg:border-r border-white/10 pb-12 lg:pb-0">
-            <div>
-              <h3 className="font-serif uppercase tracking-[2px] text-xl mb-6 text-white flex items-center">Dispatch Headquarters</h3>
-              <p className="text-gray-400 font-light leading-relaxed text-sm">Boronia, Victoria<br/>Australia<br/><br/>(Visits strictly by private appointment only. Security protocols in effect.)</p>
-            </div>
-            <div>
-              <h3 className="font-serif uppercase tracking-[2px] text-xl mb-6 text-white flex items-center">Electronic Mail</h3>
-              <p className="text-gray-400 font-light text-sm"><a href="mailto:info.hywatches@gmail.com" className="hover:text-[#c5a059]">info.hywatches@gmail.com</a></p>
-            </div>
-            <div>
-              <h3 className="font-serif uppercase tracking-[2px] text-xl mb-6 text-white flex items-center">Encrypted Network</h3>
-              <p className="text-gray-400 font-light text-sm">WhatsApp / Telegram<br/><span className="text-[#c5a059]">+61 000 000 000</span></p>
-            </div>
+            <div><h3 className="font-serif uppercase tracking-[2px] text-xl mb-6 text-white">Dispatch Headquarters</h3><p className="text-gray-400 font-light leading-relaxed text-sm">Boronia, Victoria<br/>Australia<br/></p></div>
+            <div><h3 className="font-serif uppercase tracking-[2px] text-xl mb-6 text-white">Electronic Mail</h3><p className="text-gray-400 font-light text-sm"><a href="mailto:info.hywatches@gmail.com" className="hover:text-[#c5a059]">info.hywatches@gmail.com</a></p></div>
+            <div><h3 className="font-serif uppercase tracking-[2px] text-xl mb-6 text-white">Encrypted Network</h3><p className="text-gray-400 font-light text-sm">WhatsApp / Telegram<br/><span className="text-[#c5a059]">+61 000 000 000</span></p></div>
           </div>
           <div className="lg:col-span-3">
             {submitted ? (
               <div className="h-full flex flex-col items-center justify-center text-center p-12 bg-[#111] border border-[#c5a059]/30">
                 <ShieldCheck size={64} className="text-[#c5a059] mb-6" />
                 <h3 className="font-serif text-2xl uppercase tracking-[2px] mb-4">Transmission Secured</h3>
-                <p className="text-gray-400 font-light text-sm">A senior broker will review your mandate and establish contact within 12 hours.</p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col space-y-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="flex flex-col">
-                    <label className="text-[10px] uppercase tracking-[2px] text-gray-500 mb-2 font-bold">Designation</label>
-                    <input required type="text" className="bg-transparent border-b border-white/20 pb-3 text-sm text-white focus:outline-none focus:border-[#c5a059] transition-colors" placeholder="Full Name" value={formData.name} onChange={e=>setFormData({...formData, name: e.target.value})}/>
-                  </div>
-                  <div className="flex flex-col">
-                    <label className="text-[10px] uppercase tracking-[2px] text-gray-500 mb-2 font-bold">Return Address</label>
-                    <input required type="email" className="bg-transparent border-b border-white/20 pb-3 text-sm text-white focus:outline-none focus:border-[#c5a059] transition-colors" placeholder="Email Address" value={formData.email} onChange={e=>setFormData({...formData, email: e.target.value})}/>
-                  </div>
-                </div>
-                <div className="flex flex-col">
-                  <label className="text-[10px] uppercase tracking-[2px] text-gray-500 mb-2 font-bold">Acquisition Subject</label>
-                  <select required className="bg-black border-b border-white/20 pb-3 text-sm text-gray-400 focus:outline-none focus:border-[#c5a059] transition-colors appearance-none" value={formData.subject} onChange={e=>setFormData({...formData, subject: e.target.value})}>
-                    <option value="" disabled>Select Inquiry Type</option>
-                    <option value="purchase">Acquire a Timepiece</option>
-                    <option value="sell">Sell/Trade a Timepiece</option>
-                    <option value="custom">Bespoke Customization</option>
-                    <option value="support">Logistics/Support</option>
-                  </select>
-                </div>
-                <div className="flex flex-col">
-                  <label className="text-[10px] uppercase tracking-[2px] text-gray-500 mb-2 font-bold">Mandate Details</label>
-                  <textarea required rows={5} className="bg-transparent border-b border-white/20 pb-3 text-sm text-white focus:outline-none focus:border-[#c5a059] transition-colors resize-none" placeholder="Provide reference numbers, budget parameters, or specific requirements..." value={formData.message} onChange={e=>setFormData({...formData, message: e.target.value})}></textarea>
+                  <div className="flex flex-col"><label className="text-[10px] uppercase tracking-[2px] text-gray-500 mb-2 font-bold">Designation</label><input required type="text" className="bg-transparent border-b border-white/20 pb-3 text-sm text-white focus:outline-none focus:border-[#c5a059] transition-colors" value={formData.name} onChange={e=>setFormData({...formData, name: e.target.value})}/></div>
+                  <div className="flex flex-col"><label className="text-[10px] uppercase tracking-[2px] text-gray-500 mb-2 font-bold">Return Address</label><input required type="email" className="bg-transparent border-b border-white/20 pb-3 text-sm text-white focus:outline-none focus:border-[#c5a059] transition-colors" value={formData.email} onChange={e=>setFormData({...formData, email: e.target.value})}/></div>
                 </div>
                 <button type="submit" className="btn-gold self-start mt-4"><span className="relative z-10 flex items-center">TRANSMIT DIRECTIVE <ArrowRight size={16} className="ml-3"/></span></button>
               </form>
             )}
-          </div>
-        </div>
-        <div className="mt-20 border border-white/5 p-8 bg-[#0a0a0a] flex items-start reveal-target">
-          <Shield size={24} className="text-[#c5a059] mr-6 flex-shrink-0 mt-1"/>
-          <div>
-            <h4 className="font-serif uppercase tracking-[2px] text-sm mb-2 text-white">Security Notice</h4>
-            <p className="text-xs text-gray-400 leading-[1.8] font-light max-w-[800px]">All communications regarding financial wire instructions are sent exclusively via our encrypted domains. HY Watches will never request payment via unsecured social media channels or text messages. Authenticate all routing parameters telephonically before initiating capital transfers.</p>
           </div>
         </div>
       </div>
@@ -1213,93 +935,37 @@ export function ContactPage() {
 
 export function WarrantyPage() {
   useScrollReveal();
-  useEffect(() => { window.scrollTo(0,0); }, []);
-
   return (
     <div className="w-full pt-[120px] bg-[#030303] text-white min-h-screen pb-32">
-      <div className="max-w-[1000px] mx-auto px-6 py-20">
-        <div className="text-center mb-20 reveal-target">
-          <span className="text-[#c5a059] text-[11px] tracking-[4px] uppercase font-serif block mb-4">Client Protection</span>
-          <h1 className="text-4xl md:text-6xl font-serif font-bold uppercase tracking-[2px]">WARRANTY MATRIX</h1>
-        </div>
-        <div className="bg-[#0a0a0a] border border-white/5 p-8 md:p-16 reveal-target space-y-12">
-          <div>
-            <h3 className="font-serif uppercase tracking-[2px] text-xl mb-4 text-[#c5a059]">I. Mechanical Coverage</h3>
-            <p className="text-gray-400 font-light leading-relaxed text-sm">
-              HY Watches provides a comprehensive 24-month mechanical warranty covering manufacturing defects, caliber anomalies, and movement regulation deviations outside of factory chronometric standards. This coverage activates strictly from the date of physical delivery verification.
-            </p>
-          </div>
-          <div>
-            <h3 className="font-serif uppercase tracking-[2px] text-xl mb-4 text-[#c5a059]">II. Exclusions and Voidance</h3>
-            <p className="text-gray-400 font-light leading-relaxed text-sm mb-4">The warranty matrix categorically excludes the following conditions:</p>
-            <ul className="list-disc list-inside text-gray-400 font-light text-sm space-y-2 pl-4">
-              <li>Water ingress damage resulting from improper crown security or submersion beyond specified depth ratings.</li>
-              <li>Impact trauma, dropping, or extreme kinetic shock to the case, crystal, or movement.</li>
-              <li>Magnetic magnetization requiring demagnetization servicing.</li>
-              <li>General aesthetic wear, including scratches to bracelets, clasps, or precious metal components.</li>
-            </ul>
-            <p className="text-red-400/80 font-mono text-xs mt-6 p-4 bg-red-900/10 border border-red-900/30">
-              CRITICAL: Unauthorized access to the case back or physical intervention by third-party watchmakers immediately and irrevocably voids all HY Watches warranty coverage.
-            </p>
-          </div>
-        </div>
-      </div>
+      <div className="max-w-[1000px] mx-auto px-6 py-20 text-center"><h1 className="text-4xl md:text-6xl font-serif font-bold uppercase tracking-[2px]">WARRANTY MATRIX</h1></div>
     </div>
   );
 }
 
 export function TermsPage() {
   useScrollReveal();
-  useEffect(() => { window.scrollTo(0,0); }, []);
-
   return (
     <div className="w-full pt-[120px] bg-[#030303] text-white min-h-screen pb-32">
-      <div className="max-w-[1000px] mx-auto px-6 py-20">
-        <div className="text-center mb-20 reveal-target">
-          <span className="text-[#c5a059] text-[11px] tracking-[4px] uppercase font-serif block mb-4">Legal Architecture</span>
-          <h1 className="text-4xl md:text-6xl font-serif font-bold uppercase tracking-[2px]">TERMS OF SERVICE</h1>
-        </div>
-        <div className="bg-[#0a0a0a] border border-white/5 p-8 md:p-16 reveal-target space-y-12">
-          <div>
-            <h3 className="font-serif uppercase tracking-[2px] text-xl mb-4 text-[#c5a059]">1. Asset Procurement and Capital Transfer</h3>
-            <p className="text-gray-400 font-light leading-relaxed text-sm">
-              All acquisitions require 100% capital clearance prior to dispatch. Accepted networks include Bank Wire Transfer and verified Cryptocurrency networks (BTC/USDT). Timepieces remain the strict property of HY Watches until financial clearing is fully settled within our corporate escrow.
-            </p>
-          </div>
-          <div>
-            <h3 className="font-serif uppercase tracking-[2px] text-xl mb-4 text-[#c5a059]">2. Global Logistics & Liability</h3>
-            <p className="text-gray-400 font-light leading-relaxed text-sm">
-              HY Watches assumes full liability for the physical asset while in transit via our authorized FedEx/DHL Priority networks. Liability formally transfers to the client at the exact timestamp of courier delivery verification. The acquiring party assumes total responsibility for all international customs declarations, import tariffs, and localized taxation.
-            </p>
-          </div>
-          <div>
-            <h3 className="font-serif uppercase tracking-[2px] text-xl mb-4 text-[#c5a059]">3. Return Logistics</h3>
-            <p className="text-gray-400 font-light leading-relaxed text-sm">
-              Returns are permissible strictly within 7 calendar days of delivery. The asset must remain unworn, unsized, and fully encased in original factory protective polymers. The client bears all return logistics costs and transit insurance liability. Customized, engraved, or diamond-set pieces are categorically deemed final sale.
-            </p>
-          </div>
-        </div>
-      </div>
+      <div className="max-w-[1000px] mx-auto px-6 py-20 text-center"><h1 className="text-4xl md:text-6xl font-serif font-bold uppercase tracking-[2px]">TERMS OF SERVICE</h1></div>
     </div>
   );
 }
-
-// ==========================================
-// ROOT INJECTION
-// ==========================================
 
 export function Layout() {
   const { currentRoute, isCartOpen, setCartOpen } = useAppContext();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [preloaderActive, setPreloaderActive] = useState(true);
 
   useEffect(() => {
-    const handleOpenModal = (e: CustomEvent) => {
-      setSelectedProduct(e.detail);
-      setModalOpen(true);
-    };
-    window.addEventListener('openProductModal' as any, handleOpenModal);
-    return () => window.removeEventListener('openProductModal' as any, handleOpenModal);
+    const handleOpenModal = (e: CustomEvent) => { setSelectedProduct(e.detail); setModalOpen(true); };
+    if (typeof window !== 'undefined') window.addEventListener('openProductModal' as any, handleOpenModal as any);
+    return () => { if (typeof window !== 'undefined') window.removeEventListener('openProductModal' as any, handleOpenModal as any); };
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setPreloaderActive(false), 2000);
+    return () => clearTimeout(timer);
   }, []);
 
   const renderRoute = () => {
@@ -1318,26 +984,18 @@ export function Layout() {
     <>
       <GlobalStyles />
       <CustomCursor />
-      
-      <div className="fixed right-6 bottom-8 z-[90] flex flex-col gap-4 reveal-target delay-400">
-        <a href="mailto:info.hywatches@gmail.com" className="w-12 h-12 rounded-full flex items-center justify-center shadow-[0_10px_30px_rgba(0,0,0,0.8)] transition-all duration-300 hover:scale-110 bg-[#0a0a0a] border border-white/10 text-white hover:border-[#c5a059] hover:bg-[#c5a059] hover:text-black group">
-          <MessageCircle size={18} />
-        </a>
-        <a href="#" className="w-12 h-12 rounded-full flex items-center justify-center shadow-[0_10px_30px_rgba(0,0,0,0.8)] transition-all duration-300 hover:scale-110 bg-[#0a0a0a] border border-white/10 text-white hover:border-[#c5a059] hover:bg-[#c5a059] hover:text-black group">
-          <Instagram size={18} />
-        </a>
+      <div className={`fixed inset-0 z-[9999] bg-[#030303] flex items-center justify-center transition-opacity duration-1000 ${preloaderActive ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <div className="flex flex-col items-center">
+          <div className="w-[2px] h-12 bg-white/20 relative overflow-hidden mb-6"><div className="absolute top-0 left-0 w-full h-full bg-[#c5a059] animate-[slideDown_1.5s_ease-in-out_infinite]"></div></div>
+          <span className="font-serif text-[#c5a059] tracking-[8px] text-sm uppercase">HY Watches</span>
+        </div>
       </div>
-
       <Header />
       <MobileMenu />
       <CartDrawer />
       <ProductModal isOpen={modalOpen} product={selectedProduct} onClose={() => setModalOpen(false)} />
       <SecureCheckout isOpen={isCartOpen && currentRoute === 'CHECKOUT'} onClose={() => setCartOpen(false)} />
-      
-      <main className="flex-grow flex flex-col min-h-screen relative z-10">
-        {renderRoute()}
-      </main>
-
+      <main className="flex-grow flex flex-col min-h-screen relative z-10">{renderRoute()}</main>
       <Footer />
     </>
   );

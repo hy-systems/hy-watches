@@ -1,11 +1,50 @@
 import React, { useState, useEffect, createContext, useContext, ReactNode, useRef } from 'react';
 import { 
-  Search, Globe, ShoppingBag, Menu, X, Instagram, Facebook, 
-  ChevronDown, ArrowRight, MessageCircle 
+  Search, Globe, ShoppingBag, Menu, ChevronLeft, ChevronRight, 
+  Star, Play, Package, CreditCard, ShieldCheck, X, Instagram, 
+  Facebook, ArrowRight, ArrowUpRight, Watch, Clock, Shield,
+  Mail, MapPin, Phone, CheckCircle, AlertCircle, Filter, SlidersHorizontal,
+  MessageCircle
 } from 'lucide-react';
 
 // ==========================================
-// 1. GLOBAL STATE & CONTEXT
+// DATA MAPPING & ASSETS
+// ==========================================
+
+const WATCH_DATABASE = [
+  { id: 'RM-01', brand: 'Richard Mille', model: 'RM67-02 Black Carbon TPT "BLUE TIFFANY"', price: 4600, category: 'Carbon', description: 'Engineered for optimal performance on the wrist of elite athletes. The RM 67-02 weighs a mere 32 grams, utilizing TPT composite materials and a grade 5 titanium baseplate. The blue Tiffany accents provide a striking contrast against the dark carbon matrix.', specs: { material: 'Carbon TPT', movement: 'Automatic CRMA7', reserve: '50 Hours', waterResist: '30m', diameter: '38.7mm' }, image: 'https://lucytimepieces.com/wp-content/uploads/2026/07/14-247x247.png', images: ['https://lucytimepieces.com/wp-content/uploads/2026/07/14-247x247.png', 'https://lucytimepieces.com/wp-content/uploads/2026/07/14-247x247.png'], tag: 'LIMITED' },
+  { id: 'RM-02', brand: 'Richard Mille', model: 'RM67-02 Full Black Carbon TPT NEW 2026', price: 4600, category: 'Carbon', description: 'A stealth interpretation of the ultimate sports watch. The full black carbon construction absorbs light while showcasing the unique damascene patterns inherent to the TPT manufacturing process.', specs: { material: 'Carbon TPT', movement: 'Automatic CRMA7', reserve: '50 Hours', waterResist: '30m', diameter: '38.7mm' }, image: 'https://lucytimepieces.com/wp-content/uploads/2026/07/z8006286682919_f8b17d8de483fd6eea96a18109486c17-247x247.jpg', images: ['https://lucytimepieces.com/wp-content/uploads/2026/07/13-247x247.png', 'https://lucytimepieces.com/wp-content/uploads/2026/07/z8006286682919_f8b17d8de483fd6eea96a18109486c17-247x247.jpg'], tag: 'NEW' },
+  { id: 'RM-03', brand: 'Richard Mille', model: 'RM67-01 Extra-Flat Titanium Handcrafted', price: 3600, category: 'Titanium', description: 'The RM 67-01 continues the legacy of the extra-flat watch, an exercise in extreme minimalism without sacrificing the characteristic Richard Mille tonneau shape.', specs: { material: 'Grade 5 Titanium', movement: 'Automatic CRMA6', reserve: '50 Hours', waterResist: '30m', diameter: '38.7mm' }, image: 'https://lucytimepieces.com/wp-content/uploads/2026/06/richard-mille-titanium-rm-67-01-richard-mille-40267223892212-247x247.webp', images: ['https://lucytimepieces.com/wp-content/uploads/2026/06/richard-mille-titanium-rm-67-01-richard-mille-40267223892212-247x247.webp', 'https://lucytimepieces.com/wp-content/uploads/2026/06/z7906650067246_19d6570c08bbd3dbe99f9dd1c5ebe25a-247x247.webp'], tag: 'HOT' },
+  { id: 'PP-01', brand: 'Patek Philippe', model: 'Nautilus 5711/1A Green 40mm Custom', price: 5600, category: 'Steel', description: 'The definitive luxury sports watch, reinvented with a highly sought-after olive green sunburst dial. The integrated stainless steel bracelet and porthole case design represent the peak of 1970s Gerald Genta design.', specs: { material: 'Stainless Steel', movement: 'Automatic 26-330 S C', reserve: '45 Hours', waterResist: '120m', diameter: '40mm' }, image: 'https://lucytimepieces.com/wp-content/uploads/2026/05/Thiet-ke-chua-co-ten-49-247x247.png', images: ['https://lucytimepieces.com/wp-content/uploads/2026/05/Thiet-ke-chua-co-ten-49-247x247.png', 'https://lucytimepieces.com/wp-content/uploads/2026/05/z7832313171371_7d87d006d198f4ebf69985070e6c4af7-247x247.webp'], tag: 'EXCLUSIVE' },
+  { id: 'RX-01', brand: 'Rolex', model: 'Day-Date 228239-0076 VIP Version', price: 920, category: 'White Gold', description: 'The ultimate watch of prestige. Cast in 18kt white gold, this Day-Date features a mesmerizing blue ombre dial that transitions from bright center to dark edges.', specs: { material: '18kt White Gold', movement: 'Automatic 3255', reserve: '70 Hours', waterResist: '100m', diameter: '40mm' }, image: 'https://lucytimepieces.com/wp-content/uploads/2026/05/Dong-ho-nam-Rolex-Day-Date-Rep-11-mat-xanh-ombre-nang-212-gram-bo-may-calibre-3255-xuong-RC-40mm-1-600x600-1-247x247.jpg', images: ['https://lucytimepieces.com/wp-content/uploads/2026/05/Thiet-ke-chua-co-ten-1-14-247x247.png', 'https://lucytimepieces.com/wp-content/uploads/2026/05/Dong-ho-nam-Rolex-Day-Date-Rep-11-mat-xanh-ombre-nang-212-gram-bo-may-calibre-3255-xuong-RC-40mm-1-600x600-1-247x247.jpg'], tag: 'RESTOCKED' },
+  { id: 'RX-02', brand: 'Rolex', model: 'Datejust 36 M126234-0057 VIP Version', price: 820, category: 'Steel & Gold', description: 'A timeless classic in a versatile 36mm case. Combining Oystersteel and 18kt white gold, this Datejust features the signature fluted bezel and a comfortable Jubilee bracelet.', specs: { material: 'Oystersteel & White Gold', movement: 'Automatic 3235', reserve: '70 Hours', waterResist: '100m', diameter: '36mm' }, image: 'https://lucytimepieces.com/wp-content/uploads/2026/05/Thiet-ke-chua-co-ten-1-10-247x247.png', images: ['https://lucytimepieces.com/wp-content/uploads/2026/05/Thiet-ke-chua-co-ten-1-10-247x247.png', 'https://lucytimepieces.com/wp-content/uploads/2026/05/Thiet-ke-chua-co-ten-1-10-247x247.png'], tag: 'CLASSIC' },
+  { id: 'RX-03', brand: 'Rolex', model: 'Datejust 126233-0017 VIP Version', price: 820, category: 'Two-Tone', description: 'The quintessential Rolex aesthetic. Yellow Rolesor pairs the strength of Oystersteel with the luxury of 18kt yellow gold. The champagne dial and fluted bezel create a warm presence.', specs: { material: 'Yellow Rolesor', movement: 'Automatic 3235', reserve: '70 Hours', waterResist: '100m', diameter: '36mm' }, image: 'https://lucytimepieces.com/wp-content/uploads/2026/05/Thiet-ke-chua-co-ten-1-9-247x247.png', images: ['https://lucytimepieces.com/wp-content/uploads/2026/05/Thiet-ke-chua-co-ten-1-9-247x247.png', 'https://lucytimepieces.com/wp-content/uploads/2026/05/Thiet-ke-chua-co-ten-1-9-247x247.png'], tag: 'POPULAR' },
+  { id: 'RX-04', brand: 'Rolex', model: 'Datejust 126334-0010 Green Ombre New 2026', price: 720, category: 'Steel', description: 'A modern interpretation of the Datejust in a larger 41mm format. The dial features a captivating green ombre finish, transitioning to deep black at the periphery.', specs: { material: 'Oystersteel & White Gold', movement: 'Automatic 3235', reserve: '70 Hours', waterResist: '100m', diameter: '41mm' }, image: 'https://lucytimepieces.com/wp-content/uploads/2026/05/Thiet-ke-chua-co-ten-2-247x247.png', images: ['https://lucytimepieces.com/wp-content/uploads/2026/05/Thiet-ke-chua-co-ten-2-247x247.png', 'https://lucytimepieces.com/wp-content/uploads/2026/05/Thiet-ke-chua-co-ten-2-247x247.png'], tag: 'TRENDING' },
+];
+
+const popularCollections = [
+  { id: 1, title: 'LUCY PICKS', subtitle: 'HY EXCLUSIVE', img: 'https://lucytimepieces.com/wp-content/uploads/2026/03/rolex-yacht-master-42-226627-rlx-titanium-black-dial-2024-rolex-1193996764.jpg', desc: 'Curated selection of our most coveted and precisely engineered timepieces.' },
+  { id: 2, title: 'DAYTONA', subtitle: 'MOTORSPORT', img: 'https://lucytimepieces.com/wp-content/uploads/2026/03/rolex-daytona-116500ln-stainless-steel-white-panda-dial-2018-rolex-1212087379.jpg', desc: 'Born to race. The ultimate tool watch for those with a passion for driving.' },
+  { id: 3, title: 'GMT-MASTER II', subtitle: 'AVIATION', img: 'https://lucytimepieces.com/wp-content/uploads/2026/03/rolex-gmt-master-ii-126710blnr-batgirl-stainless-steel-black-dial-jubilee-2021-rolex-1206409323.jpg', desc: 'Cross time zones with unparalleled precision and unmistakable aesthetic.' },
+  { id: 4, title: 'DATEJUST', subtitle: 'CLASSIC', img: 'https://lucytimepieces.com/wp-content/uploads/2026/03/rolex-datejust-41-126334-stainless-steel-blue-diamond-dial-jubilee-2021-rolex-1197074364.jpg', desc: 'The archetype of the classic watch. Timeless elegance and functionality.' }
+];
+
+const collectionGrid = [
+  { colSpan: 'md:col-span-2 md:row-span-2', img: 'https://lucytimepieces.com/wp-content/uploads/2026/03/richard-mille-rm-67-02-sebastien-ogier-carbon-tpt-2024-richard-mille-43740914483444.jpg', title: 'RICHARD MILLE', subtitle: 'THE RACING MACHINE' },
+  { colSpan: 'md:col-span-1 md:row-span-1', img: 'https://lucytimepieces.com/wp-content/uploads/2026/03/rolex-gmt-master-ii-126711chnr-root-beer-stainless-steel-rose-gold-black-dial-2021-rolex-1221882571.jpg', title: 'ROLEX', subtitle: 'THE CROWN' },
+  { colSpan: 'md:col-span-1 md:row-span-1', img: 'https://lucytimepieces.com/wp-content/uploads/2026/03/4b821a59ae889469621bc9a95aa24e66.jpg', title: 'HUBLOT', subtitle: 'THE ART OF FUSION' },
+  { colSpan: 'md:col-span-1 md:row-span-1', img: 'https://lucytimepieces.com/wp-content/uploads/2026/03/patek-philippe-nautilus-5711-1a-010-tiffany-co-stainless-steel-blue-dial-2018-patek-philippe-1202180049.jpg', title: 'PATEK PHILIPPE', subtitle: 'GENEVA TRADITION' },
+  { colSpan: 'md:col-span-1 md:row-span-1', img: 'https://lucytimepieces.com/wp-content/uploads/2026/03/audemars-piguet-royal-oak-selfwinding-15510st-oo-1320st-09-stainless-steel-green-dial-2025-audemars-piguet-1195982415.jpg', title: 'AUDEMARS PIGUET', subtitle: 'LE BRASSUS' }
+];
+
+const socialMediaVideos = [
+  { type: 'TIKTOK', icon: <Play size={16} strokeWidth={2.5} />, videoSrc: 'https://assets.mixkit.co/videos/preview/mixkit-hands-of-a-man-adjusting-his-wristwatch-4245-large.mp4', link: '#' },
+  { type: 'INSTAGRAM', icon: <Instagram size={16} strokeWidth={2.5} />, videoSrc: 'https://assets.mixkit.co/videos/preview/mixkit-close-up-of-a-luxury-watch-on-a-mans-wrist-4246-large.mp4', link: '#' },
+  { type: 'FACEBOOK', icon: <Facebook size={16} strokeWidth={2.5} />, videoSrc: 'https://assets.mixkit.co/videos/preview/mixkit-man-putting-on-a-luxury-watch-4244-large.mp4', link: '#' }
+];
+
+// ==========================================
+// GLOBAL STATE & CONTEXT
 // ==========================================
 
 interface CartItem {
@@ -14,6 +53,7 @@ interface CartItem {
   model: string;
   price: number;
   image: string;
+  images?: string[];
 }
 
 interface AppContextType {
@@ -73,7 +113,7 @@ function AppProvider({ children }: { children: ReactNode }) {
 }
 
 // ==========================================
-// 2. GLOBAL ANIMATION HOOKS
+// GLOBAL ANIMATION HOOKS
 // ==========================================
 
 export function useScrollReveal() {
@@ -110,7 +150,7 @@ export function useParallax() {
 }
 
 // ==========================================
-// 3. GLOBAL STYLESHEET
+// GLOBAL STYLESHEET
 // ==========================================
 
 const GlobalStyles = () => (
@@ -165,8 +205,67 @@ const GlobalStyles = () => (
 );
 
 // ==========================================
-// 4. PERSISTENT LAYOUT COMPONENTS
+// PERSISTENT LAYOUT COMPONENTS
 // ==========================================
+
+export function CustomCursor() {
+  const cursorRef = useRef<HTMLDivElement>(null);
+  const dotRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (window.innerWidth < 1024) return;
+
+    const moveCursor = (e: MouseEvent) => {
+      if (cursorRef.current && dotRef.current) {
+        cursorRef.current.style.transform = `translate3d(${e.clientX - 16}px, ${e.clientY - 16}px, 0)`;
+        dotRef.current.style.transform = `translate3d(${e.clientX - 2}px, ${e.clientY - 2}px, 0)`;
+      }
+    };
+
+    const handleHover = () => {
+      if (cursorRef.current) {
+        cursorRef.current.classList.add('scale-150', 'bg-[#c5a059]/10', 'border-[#c5a059]');
+        cursorRef.current.classList.remove('border-white/30');
+      }
+    };
+
+    const handleLeave = () => {
+      if (cursorRef.current) {
+        cursorRef.current.classList.remove('scale-150', 'bg-[#c5a059]/10', 'border-[#c5a059]');
+        cursorRef.current.classList.add('border-white/30');
+      }
+    };
+
+    window.addEventListener('mousemove', moveCursor);
+    
+    const interactiveElements = document.querySelectorAll('a, button, input, select, textarea, .cursor-pointer');
+    interactiveElements.forEach(el => {
+      el.addEventListener('mouseenter', handleHover);
+      el.addEventListener('mouseleave', handleLeave);
+    });
+
+    return () => {
+      window.removeEventListener('mousemove', moveCursor);
+      interactiveElements.forEach(el => {
+        el.removeEventListener('mouseenter', handleHover);
+        el.removeEventListener('mouseleave', handleLeave);
+      });
+    };
+  }, []);
+
+  return (
+    <div className="hidden lg:block pointer-events-none z-[9999]">
+      <div 
+        ref={cursorRef} 
+        className="fixed top-0 left-0 w-8 h-8 rounded-full border border-white/30 mix-blend-difference transition-all duration-300 ease-out will-change-transform"
+      ></div>
+      <div 
+        ref={dotRef} 
+        className="fixed top-0 left-0 w-1 h-1 bg-[#c5a059] rounded-full mix-blend-difference will-change-transform"
+      ></div>
+    </div>
+  );
+}
 
 function Header() {
   const { navigate, setMobileMenuOpen, setCartOpen, cartItems } = useAppContext();
@@ -276,7 +375,7 @@ function CartDrawer() {
             <div className="space-y-6">
               {cartItems.map((item, idx) => (
                 <div key={idx} className="flex items-center gap-4 bg-[#0a0a0a] p-4 border border-white/5">
-                  <img src={item.image} alt={item.model} className="w-20 h-20 object-contain bg-[#111]" />
+                  <img src={item.image || (item.images && item.images[0])} alt={item.model} className="w-20 h-20 object-contain bg-[#111]" />
                   <div className="flex-grow">
                     <p className="text-[10px] text-[#c5a059] tracking-[2px] uppercase font-serif mb-1">{item.brand}</p>
                     <p className="text-xs font-mono text-gray-300 line-clamp-2">{item.model}</p>
@@ -332,7 +431,8 @@ function Footer() {
             <ul className="space-y-4 text-[13px] font-light text-gray-400">
               <li><a className="hover:text-white cursor-pointer transition-colors" onClick={() => navigate('CONTACT')}>Procurement</a></li>
               <li><a className="hover:text-white cursor-pointer transition-colors" onClick={() => navigate('CONTACT')}>Global Shipping</a></li>
-              <li><a className="hover:text-white cursor-pointer transition-colors" onClick={() => navigate('CONTACT')}>Warranty</a></li>
+              <li><a className="hover:text-white cursor-pointer transition-colors" onClick={() => navigate('WARRANTY')}>Warranty</a></li>
+              <li><a className="hover:text-white cursor-pointer transition-colors" onClick={() => navigate('TERMS')}>Terms of Service</a></li>
             </ul>
           </div>
           
@@ -370,44 +470,340 @@ function Footer() {
 }
 
 // ==========================================
-// 5. ROOT INJECTION
-// ==========================================
-// ==========================================
-// DATA MAPPING & ASSETS
+// MODALS
 // ==========================================
 
-const WATCH_DATABASE = [
-  { id: 'RM-01', brand: 'Richard Mille', model: 'RM67-02 Black Carbon TPT "BLUE TIFFANY"', price: 4600, category: 'Carbon', description: 'Engineered for optimal performance on the wrist of elite athletes. The RM 67-02 weighs a mere 32 grams, utilizing TPT composite materials and a grade 5 titanium baseplate. The blue Tiffany accents provide a striking contrast against the dark carbon matrix.', specs: { material: 'Carbon TPT', movement: 'Automatic CRMA7', reserve: '50 Hours', waterResist: '30m', diameter: '38.7mm' }, image: 'https://lucytimepieces.com/wp-content/uploads/2026/07/14-247x247.png', tag: 'LIMITED' },
-  { id: 'RM-02', brand: 'Richard Mille', model: 'RM67-02 Full Black Carbon TPT NEW 2026', price: 4600, category: 'Carbon', description: 'A stealth interpretation of the ultimate sports watch. The full black carbon construction absorbs light while showcasing the unique damascene patterns inherent to the TPT manufacturing process.', specs: { material: 'Carbon TPT', movement: 'Automatic CRMA7', reserve: '50 Hours', waterResist: '30m', diameter: '38.7mm' }, image: 'https://lucytimepieces.com/wp-content/uploads/2026/07/z8006286682919_f8b17d8de483fd6eea96a18109486c17-247x247.jpg', tag: 'NEW' },
-  { id: 'RM-03', brand: 'Richard Mille', model: 'RM67-01 Extra-Flat Titanium Handcrafted', price: 3600, category: 'Titanium', description: 'The RM 67-01 continues the legacy of the extra-flat watch, an exercise in extreme minimalism without sacrificing the characteristic Richard Mille tonneau shape.', specs: { material: 'Grade 5 Titanium', movement: 'Automatic CRMA6', reserve: '50 Hours', waterResist: '30m', diameter: '38.7mm' }, image: 'https://lucytimepieces.com/wp-content/uploads/2026/06/richard-mille-titanium-rm-67-01-richard-mille-40267223892212-247x247.webp', tag: 'HOT' },
-  { id: 'PP-01', brand: 'Patek Philippe', model: 'Nautilus 5711/1A Green 40mm Custom', price: 5600, category: 'Steel', description: 'The definitive luxury sports watch, reinvented with a highly sought-after olive green sunburst dial. The integrated stainless steel bracelet and porthole case design represent the peak of 1970s Gerald Genta design.', specs: { material: 'Stainless Steel', movement: 'Automatic 26-330 S C', reserve: '45 Hours', waterResist: '120m', diameter: '40mm' }, image: 'https://lucytimepieces.com/wp-content/uploads/2026/05/Thiet-ke-chua-co-ten-49-247x247.png', tag: 'EXCLUSIVE' },
-  { id: 'RX-01', brand: 'Rolex', model: 'Day-Date 228239-0076 VIP Version', price: 920, category: 'White Gold', description: 'The ultimate watch of prestige. Cast in 18kt white gold, this Day-Date features a mesmerizing blue ombre dial that transitions from bright center to dark edges.', specs: { material: '18kt White Gold', movement: 'Automatic 3255', reserve: '70 Hours', waterResist: '100m', diameter: '40mm' }, image: 'https://lucytimepieces.com/wp-content/uploads/2026/05/Dong-ho-nam-Rolex-Day-Date-Rep-11-mat-xanh-ombre-nang-212-gram-bo-may-calibre-3255-xuong-RC-40mm-1-600x600-1-247x247.jpg', tag: 'RESTOCKED' },
-  { id: 'RX-02', brand: 'Rolex', model: 'Datejust 36 M126234-0057 VIP Version', price: 820, category: 'Steel & Gold', description: 'A timeless classic in a versatile 36mm case. Combining Oystersteel and 18kt white gold, this Datejust features the signature fluted bezel and a comfortable Jubilee bracelet.', specs: { material: 'Oystersteel & White Gold', movement: 'Automatic 3235', reserve: '70 Hours', waterResist: '100m', diameter: '36mm' }, image: 'https://lucytimepieces.com/wp-content/uploads/2026/05/Thiet-ke-chua-co-ten-1-10-247x247.png', tag: 'CLASSIC' },
-  { id: 'RX-03', brand: 'Rolex', model: 'Datejust 126233-0017 VIP Version', price: 820, category: 'Two-Tone', description: 'The quintessential Rolex aesthetic. Yellow Rolesor pairs the strength of Oystersteel with the luxury of 18kt yellow gold. The champagne dial and fluted bezel create a warm presence.', specs: { material: 'Yellow Rolesor', movement: 'Automatic 3235', reserve: '70 Hours', waterResist: '100m', diameter: '36mm' }, image: 'https://lucytimepieces.com/wp-content/uploads/2026/05/Thiet-ke-chua-co-ten-1-9-247x247.png', tag: 'POPULAR' },
-  { id: 'RX-04', brand: 'Rolex', model: 'Datejust 126334-0010 Green Ombre New 2026', price: 720, category: 'Steel', description: 'A modern interpretation of the Datejust in a larger 41mm format. The dial features a captivating green ombre finish, transitioning to deep black at the periphery.', specs: { material: 'Oystersteel & White Gold', movement: 'Automatic 3235', reserve: '70 Hours', waterResist: '100m', diameter: '41mm' }, image: 'https://lucytimepieces.com/wp-content/uploads/2026/05/Thiet-ke-chua-co-ten-2-247x247.png', tag: 'TRENDING' },
-];
+export function ProductModal({ product, isOpen, onClose }: { product: any, isOpen: boolean, onClose: () => void }) {
+  const { addToCart } = useAppContext();
+  const [activeImage, setActiveImage] = useState(0);
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
-const popularCollections = [
-  { id: 1, title: 'LUCY PICKS', subtitle: 'HY EXCLUSIVE', img: 'https://lucytimepieces.com/wp-content/uploads/2026/03/rolex-yacht-master-42-226627-rlx-titanium-black-dial-2024-rolex-1193996764.jpg', desc: 'Curated selection of our most coveted and precisely engineered timepieces.' },
-  { id: 2, title: 'DAYTONA', subtitle: 'MOTORSPORT', img: 'https://lucytimepieces.com/wp-content/uploads/2026/03/rolex-daytona-116500ln-stainless-steel-white-panda-dial-2018-rolex-1212087379.jpg', desc: 'Born to race. The ultimate tool watch for those with a passion for driving.' },
-  { id: 3, title: 'GMT-MASTER II', subtitle: 'AVIATION', img: 'https://lucytimepieces.com/wp-content/uploads/2026/03/rolex-gmt-master-ii-126710blnr-batgirl-stainless-steel-black-dial-jubilee-2021-rolex-1206409323.jpg', desc: 'Cross time zones with unparalleled precision and unmistakable aesthetic.' },
-  { id: 4, title: 'DATEJUST', subtitle: 'CLASSIC', img: 'https://lucytimepieces.com/wp-content/uploads/2026/03/rolex-datejust-41-126334-stainless-steel-blue-diamond-dial-jubilee-2021-rolex-1197074364.jpg', desc: 'The archetype of the classic watch. Timeless elegance and functionality.' }
-];
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      setActiveImage(0);
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => { document.body.style.overflow = 'unset'; };
+  }, [isOpen]);
 
-const socialMediaVideos = [
-  { type: 'TIKTOK', icon: <Play size={16} strokeWidth={2.5} />, videoSrc: 'https://assets.mixkit.co/videos/preview/mixkit-hands-of-a-man-adjusting-his-wristwatch-4245-large.mp4', link: '#' },
-  { type: 'INSTAGRAM', icon: <Instagram size={16} strokeWidth={2.5} />, videoSrc: 'https://assets.mixkit.co/videos/preview/mixkit-close-up-of-a-luxury-watch-on-a-mans-wrist-4246-large.mp4', link: '#' },
-  { type: 'FACEBOOK', icon: <Facebook size={16} strokeWidth={2.5} />, videoSrc: 'https://assets.mixkit.co/videos/preview/mixkit-man-putting-on-a-luxury-watch-4244-large.mp4', link: '#' }
-];
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - left) / width) * 100;
+    const y = ((e.clientY - top) / height) * 100;
+    setMousePos({ x, y });
+  };
+
+  if (!isOpen || !product) return null;
+
+  return (
+    <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 md:p-6">
+      <div className="absolute inset-0 bg-black/90 backdrop-blur-xl transition-opacity animate-[fadeIn_0.3s_ease-out]" onClick={onClose}></div>
+      
+      <div className="relative w-full max-w-[1200px] max-h-[90vh] bg-[#050505] border border-white/10 shadow-[0_30px_60px_rgba(0,0,0,0.9)] flex flex-col md:flex-row overflow-hidden animate-[slideUp_0.4s_cubic-bezier(0.16,1,0.3,1)]">
+        
+        <button onClick={onClose} className="absolute top-6 right-6 z-50 w-10 h-10 rounded-full bg-black/50 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-all backdrop-blur-md">
+          <X size={20} />
+        </button>
+
+        <div className="w-full md:w-1/2 bg-[#0a0a0a] relative flex flex-col border-r border-white/5">
+          <div className="absolute top-6 left-6 z-10 flex gap-2">
+            <span className="bg-[#c5a059] text-black text-[10px] font-bold px-3 py-1.5 uppercase tracking-[2px] shadow-lg">{product.tag}</span>
+            <span className="bg-white/10 backdrop-blur-md text-white border border-white/20 text-[10px] font-bold px-3 py-1.5 uppercase tracking-[2px]">In Stock</span>
+          </div>
+          
+          <div 
+            className="relative flex-grow flex items-center justify-center p-12 cursor-crosshair overflow-hidden group"
+            onMouseEnter={() => setIsZoomed(true)}
+            onMouseLeave={() => setIsZoomed(false)}
+            onMouseMove={handleMouseMove}
+          >
+            <img 
+              src={product.images[activeImage] || product.image} 
+              alt={product.model} 
+              className={`w-full h-full object-contain transition-transform duration-300 ${isZoomed ? 'opacity-0' : 'opacity-100'}`}
+            />
+            {isZoomed && (
+              <div 
+                className="absolute inset-0 bg-no-repeat transition-opacity duration-300 opacity-100 z-20"
+                style={{
+                  backgroundImage: `url(${product.images[activeImage] || product.image})`,
+                  backgroundPosition: `${mousePos.x}% ${mousePos.y}%`,
+                  backgroundSize: '250%'
+                }}
+              />
+            )}
+          </div>
+          
+          <div className="flex p-6 gap-4 border-t border-white/5 bg-[#050505] overflow-x-auto">
+            {(product.images || [product.image]).map((img: string, idx: number) => (
+              <button 
+                key={idx} 
+                onClick={() => setActiveImage(idx)}
+                className={`w-20 h-20 flex-shrink-0 border bg-[#111] transition-all p-2 ${activeImage === idx ? 'border-[#c5a059]' : 'border-white/10 hover:border-white/30'}`}
+              >
+                <img src={img} alt={`Thumbnail ${idx}`} className="w-full h-full object-contain" />
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="w-full md:w-1/2 flex flex-col bg-[#050505] overflow-y-auto">
+          <div className="p-8 md:p-12">
+            <span className="text-[#c5a059] text-[11px] tracking-[4px] uppercase font-serif mb-3 block">{product.brand}</span>
+            <h2 className="text-2xl md:text-3xl font-mono font-light text-white mb-6 leading-tight">{product.model}</h2>
+            
+            <div className="flex items-center gap-4 mb-8">
+              <span className="font-serif text-3xl font-bold text-white tracking-wide">${product.price},000</span>
+              <div className="h-6 w-[1px] bg-white/20"></div>
+              <div className="flex items-center text-[#c5a059]">
+                {[1,2,3,4,5].map(s => <Star key={s} size={14} className="fill-current" />)}
+              </div>
+            </div>
+
+            <p className="text-gray-400 font-light text-sm leading-[1.8] mb-10 pb-10 border-b border-white/10">
+              {product.description}
+            </p>
+
+            <h3 className="font-serif uppercase tracking-[2px] text-xs font-bold text-white mb-6">Technical Specifications</h3>
+            <div className="grid grid-cols-2 gap-y-6 gap-x-8 mb-12">
+              <div className="flex flex-col border-l-2 border-[#c5a059] pl-4">
+                <span className="text-[10px] uppercase tracking-[2px] text-gray-500 mb-1">Material</span>
+                <span className="text-sm text-gray-200 font-light">{product.specs.material}</span>
+              </div>
+              <div className="flex flex-col border-l-2 border-[#c5a059] pl-4">
+                <span className="text-[10px] uppercase tracking-[2px] text-gray-500 mb-1">Caliber</span>
+                <span className="text-sm text-gray-200 font-light">{product.specs.movement}</span>
+              </div>
+              <div className="flex flex-col border-l-2 border-[#c5a059] pl-4">
+                <span className="text-[10px] uppercase tracking-[2px] text-gray-500 mb-1">Dimensions</span>
+                <span className="text-sm text-gray-200 font-light">{product.specs.diameter}</span>
+              </div>
+              <div className="flex flex-col border-l-2 border-[#c5a059] pl-4">
+                <span className="text-[10px] uppercase tracking-[2px] text-gray-500 mb-1">Resistance</span>
+                <span className="text-sm text-gray-200 font-light">{product.specs.waterResist}</span>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-4 mt-auto">
+              <button 
+                className="w-full bg-[#c5a059] text-black font-bold uppercase tracking-[3px] text-sm py-5 hover:bg-white transition-colors flex items-center justify-center group"
+                onClick={() => { addToCart(product); onClose(); }}
+              >
+                Acquire Asset 
+                <ArrowRight size={16} className="ml-3 transform group-hover:translate-x-1 transition-transform" />
+              </button>
+              <div className="flex justify-center items-center gap-6 mt-4 text-[10px] uppercase tracking-[2px] text-gray-500 font-bold">
+                <span className="flex items-center"><ShieldCheck size={14} className="mr-2 text-[#c5a059]" /> 2-Year Warranty</span>
+                <span className="flex items-center"><Globe size={14} className="mr-2 text-[#c5a059]" /> Global Shipping</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function SecureCheckout({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
+  const { cartItems, cartTotal, setCartOpen } = useAppContext();
+  const [step, setStep] = useState(1);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [orderComplete, setOrderComplete] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) document.body.style.overflow = 'hidden';
+    else document.body.style.overflow = 'unset';
+    return () => { document.body.style.overflow = 'unset'; };
+  }, [isOpen]);
+
+  const handleProcess = () => {
+    setIsProcessing(true);
+    setTimeout(() => {
+      setIsProcessing(false);
+      setOrderComplete(true);
+    }, 3000);
+  };
+
+  const closeAndReset = () => {
+    setStep(1);
+    setOrderComplete(false);
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[400] flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/95 backdrop-blur-2xl transition-opacity animate-[fadeIn_0.3s_ease-out]"></div>
+      
+      <div className="relative w-full max-w-[1000px] h-[100dvh] md:h-[85vh] bg-[#050505] md:border border-white/10 md:shadow-2xl flex flex-col animate-[slideUp_0.5s_cubic-bezier(0.16,1,0.3,1)]">
+        
+        <div className="flex justify-between items-center p-6 md:p-8 border-b border-white/10 bg-[#0a0a0a]">
+          <span className="font-serif uppercase tracking-[4px] text-lg font-bold text-white flex items-center">
+            <ShieldCheck size={20} className="text-[#c5a059] mr-3" /> Secure Gateway
+          </span>
+          {!isProcessing && !orderComplete && (
+            <button onClick={closeAndReset} className="text-gray-400 hover:text-white transition-colors">
+              <X size={24} />
+            </button>
+          )}
+        </div>
+
+        {orderComplete ? (
+          <div className="flex-grow flex flex-col items-center justify-center p-8 text-center bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-blend-overlay">
+            <div className="w-24 h-24 rounded-full border-2 border-[#c5a059] flex items-center justify-center mb-8 relative">
+              <div className="absolute inset-0 border-2 border-[#c5a059] rounded-full animate-ping opacity-50"></div>
+              <CheckCircle size={40} className="text-[#c5a059]" />
+            </div>
+            <h2 className="font-serif text-3xl md:text-5xl uppercase tracking-[4px] mb-4 text-white font-bold">Acquisition Secured</h2>
+            <p className="text-gray-400 font-light text-sm md:text-base max-w-[500px] mb-12 leading-relaxed">
+              Your mandate has been successfully logged. An acquisition specialist will contact your registered coordinates within 2 hours to finalize logistics.
+            </p>
+            <button className="btn-gold" onClick={() => { closeAndReset(); setCartOpen(false); }}>
+              <span className="relative z-10 text-xs">RETURN TO INVENTORY</span>
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-col md:flex-row flex-grow overflow-hidden">
+            <div className="w-full md:w-3/5 p-6 md:p-12 overflow-y-auto">
+              <div className="flex items-center justify-between mb-12 relative">
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-[1px] bg-white/10 z-0"></div>
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 h-[1px] bg-[#c5a059] z-0 transition-all duration-500" style={{ width: step === 1 ? '0%' : step === 2 ? '50%' : '100%' }}></div>
+                {[1, 2, 3].map((num) => (
+                  <div key={num} className={`relative z-10 w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold transition-colors duration-300 ${step >= num ? 'bg-[#c5a059] text-black border-[#c5a059]' : 'bg-[#111] text-gray-500 border border-white/20'}`}>
+                    {num}
+                  </div>
+                ))}
+              </div>
+
+              {step === 1 && (
+                <div className="animate-[fadeIn_0.5s_ease-out]">
+                  <h3 className="font-serif uppercase tracking-[2px] text-xl text-white mb-8 border-l-4 border-[#c5a059] pl-4">1. Client Identification</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <input type="text" placeholder="First Legal Name" className="bg-[#111] border border-white/10 p-4 text-sm text-white focus:outline-none focus:border-[#c5a059] transition-colors w-full" />
+                    <input type="text" placeholder="Last Legal Name" className="bg-[#111] border border-white/10 p-4 text-sm text-white focus:outline-none focus:border-[#c5a059] transition-colors w-full" />
+                  </div>
+                  <input type="email" placeholder="Secure Email Address" className="bg-[#111] border border-white/10 p-4 text-sm text-white focus:outline-none focus:border-[#c5a059] transition-colors w-full mb-6" />
+                  <input type="tel" placeholder="Mobile Coordinate (WhatsApp Active)" className="bg-[#111] border border-white/10 p-4 text-sm text-white focus:outline-none focus:border-[#c5a059] transition-colors w-full mb-10" />
+                  <button className="btn-gold w-full" onClick={() => setStep(2)}><span className="relative z-10 text-xs">PROCEED TO LOGISTICS</span></button>
+                </div>
+              )}
+
+              {step === 2 && (
+                <div className="animate-[fadeIn_0.5s_ease-out]">
+                  <h3 className="font-serif uppercase tracking-[2px] text-xl text-white mb-8 border-l-4 border-[#c5a059] pl-4">2. Secure Logistics</h3>
+                  <input type="text" placeholder="Primary Address Line" className="bg-[#111] border border-white/10 p-4 text-sm text-white focus:outline-none focus:border-[#c5a059] transition-colors w-full mb-6" />
+                  <div className="grid grid-cols-2 gap-6 mb-6">
+                    <input type="text" placeholder="City / Municipality" className="bg-[#111] border border-white/10 p-4 text-sm text-white focus:outline-none focus:border-[#c5a059] transition-colors w-full" />
+                    <input type="text" placeholder="State / Province" className="bg-[#111] border border-white/10 p-4 text-sm text-white focus:outline-none focus:border-[#c5a059] transition-colors w-full" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-6 mb-10">
+                    <input type="text" placeholder="Postal Code" className="bg-[#111] border border-white/10 p-4 text-sm text-white focus:outline-none focus:border-[#c5a059] transition-colors w-full" />
+                    <select className="bg-[#111] border border-white/10 p-4 text-sm text-gray-400 focus:outline-none focus:border-[#c5a059] transition-colors w-full appearance-none">
+                      <option>Australia</option>
+                      <option>United States</option>
+                      <option>United Kingdom</option>
+                      <option>United Arab Emirates</option>
+                      <option>Singapore</option>
+                      <option>Switzerland</option>
+                    </select>
+                  </div>
+                  <div className="flex gap-4">
+                    <button className="w-1/3 border border-white/20 text-white hover:bg-white/5 uppercase tracking-[2px] text-xs font-bold transition-colors" onClick={() => setStep(1)}>Back</button>
+                    <button className="btn-gold w-2/3" onClick={() => setStep(3)}><span className="relative z-10 text-xs">PROCEED TO CAPITAL</span></button>
+                  </div>
+                </div>
+              )}
+
+              {step === 3 && (
+                <div className="animate-[fadeIn_0.5s_ease-out]">
+                  <h3 className="font-serif uppercase tracking-[2px] text-xl text-white mb-8 border-l-4 border-[#c5a059] pl-4">3. Capital Transfer</h3>
+                  <div className="space-y-4 mb-10">
+                    <label className="flex items-center p-4 border border-[#c5a059] bg-[#c5a059]/10 cursor-pointer">
+                      <div className="w-4 h-4 rounded-full border border-[#c5a059] flex items-center justify-center mr-4">
+                        <div className="w-2 h-2 bg-[#c5a059] rounded-full"></div>
+                      </div>
+                      <span className="font-serif uppercase tracking-[2px] text-sm text-white flex-grow">Bank Wire Transfer</span>
+                      <span className="text-[10px] text-[#c5a059] tracking-[1px] uppercase font-bold">-0% Fee</span>
+                    </label>
+                    <label className="flex items-center p-4 border border-white/10 bg-[#111] cursor-pointer hover:border-white/30 transition-colors opacity-50">
+                      <div className="w-4 h-4 rounded-full border border-gray-600 mr-4"></div>
+                      <span className="font-serif uppercase tracking-[2px] text-sm text-white flex-grow">Cryptocurrency (USDT/BTC)</span>
+                      <span className="text-[10px] text-gray-500 tracking-[1px] uppercase">Coming Soon</span>
+                    </label>
+                  </div>
+                  <div className="bg-[#0a0a0a] border border-white/5 p-6 mb-10">
+                    <p className="text-xs text-gray-400 font-light leading-relaxed">
+                      By initiating this transfer, you mandate HY Watches to lock the requested inventory for 24 hours pending wire confirmation. Irrevocable payment routing details will be generated securely upon initiation.
+                    </p>
+                  </div>
+                  <div className="flex gap-4">
+                    <button className="w-1/3 border border-white/20 text-white hover:bg-white/5 uppercase tracking-[2px] text-xs font-bold transition-colors" onClick={() => setStep(2)} disabled={isProcessing}>Back</button>
+                    <button className="btn-gold w-2/3" onClick={handleProcess} disabled={isProcessing}>
+                      <span className="relative z-10 flex items-center text-xs">
+                        {isProcessing ? 'ESTABLISHING SECURE LINK...' : 'INITIATE PROTOCOL'}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="w-full md:w-2/5 bg-[#0a0a0a] border-l border-white/5 flex flex-col p-6 md:p-12">
+              <h3 className="font-serif uppercase tracking-[2px] text-sm text-gray-500 mb-8 font-bold">Acquisition Ledger</h3>
+              <div className="flex-grow overflow-y-auto space-y-6 mb-8 pr-2">
+                {cartItems.map((item, idx) => (
+                  <div key={idx} className="flex gap-4 items-start">
+                    <div className="w-16 h-16 bg-[#111] border border-white/5 flex-shrink-0 flex items-center justify-center p-2">
+                      <img src={item.image || (item.images && item.images[0])} className="w-full h-full object-contain" alt="" />
+                    </div>
+                    <div>
+                      <p className="text-[9px] text-[#c5a059] tracking-[2px] uppercase font-serif mb-1">{item.brand}</p>
+                      <p className="text-xs font-mono text-gray-300 line-clamp-2 leading-snug mb-2">{item.model}</p>
+                      <p className="font-bold text-sm text-white">${item.price},000</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="border-t border-white/10 pt-6 space-y-4">
+                <div className="flex justify-between text-xs text-gray-400 uppercase tracking-[1px]">
+                  <span>Subtotal</span>
+                  <span>${cartTotal},000</span>
+                </div>
+                <div className="flex justify-between text-xs text-gray-400 uppercase tracking-[1px]">
+                  <span>Priority Logistics</span>
+                  <span className="text-[#c5a059]">Complimentary</span>
+                </div>
+                <div className="flex justify-between text-xs text-gray-400 uppercase tracking-[1px]">
+                  <span>Insurance Escrow</span>
+                  <span className="text-[#c5a059]">Covered</span>
+                </div>
+                <div className="border-t border-white/10 pt-4 flex justify-between items-center mt-4">
+                  <span className="font-serif uppercase tracking-[2px] text-sm text-white">Total Commitment</span>
+                  <span className="font-serif text-2xl font-bold text-white">${cartTotal},000</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 // ==========================================
-// PAGE COMPONENTS
+// PAGES
 // ==========================================
 
 export function HomePage() {
-  const { navigate, addToCart } = useAppContext();
+  const { navigate } = useAppContext();
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const [activeCollectionSlide, setActiveCollectionSlide] = useState(0);
+  useScrollReveal();
+  useParallax();
 
   useEffect(() => {
     videoRefs.current.forEach(video => {
@@ -420,7 +816,6 @@ export function HomePage() {
 
   return (
     <div className="w-full flex flex-col">
-      {/* HERO COMPONENT */}
       <div className="relative w-full h-screen bg-[#030303] overflow-hidden flex items-center justify-center">
         <div className="ambient-light bg-[#c5a059] w-[40vw] h-[40vw] top-[30%] left-[30%] parallax-layer" data-speed="0.5"></div>
         <div className="absolute inset-0 w-full h-full parallax-layer" data-speed="0.2">
@@ -449,7 +844,37 @@ export function HomePage() {
         </div>
       </div>
 
-      {/* DYNAMIC COLLECTIONS SLIDER */}
+      <div className="relative w-full bg-[#0a0a0a] py-4 border-b border-white/5 z-20">
+        <div className="max-w-[1400px] mx-auto px-6 flex justify-center md:justify-between items-center">
+          <p className="text-gray-400 text-[10px] md:text-[11px] tracking-[3px] uppercase font-sans flex items-center">
+            <Shield size={14} className="text-[#c5a059] mr-2" />
+            100% Authenticity Guaranteed
+          </p>
+          <p className="text-gray-400 text-[10px] md:text-[11px] tracking-[3px] uppercase font-sans hidden md:flex items-center">
+            <Globe size={14} className="text-[#c5a059] mr-2" />
+            Worldwide Secured Shipping
+          </p>
+          <p className="text-[#c5a059] text-[10px] md:text-[11px] tracking-[3px] uppercase font-sans hidden lg:flex items-center font-bold">
+            Complimentary Travel Case With Order
+          </p>
+        </div>
+      </div>
+
+      <section className="relative w-full py-32 px-6 bg-[#030303] overflow-hidden">
+        <div className="ambient-light bg-white/5 w-[50vw] h-[50vw] bottom-0 right-0 parallax-layer" data-speed="-0.3"></div>
+        <div className="max-w-[1000px] mx-auto text-center flex flex-col items-center relative z-10">
+          <div className="w-12 h-12 border border-[#c5a059] rounded-full flex items-center justify-center mb-10 reveal-target">
+            <div className="w-2 h-2 bg-[#c5a059] rounded-full"></div>
+          </div>
+          <h2 className="uppercase font-serif text-3xl md:text-5xl lg:text-6xl mb-10 tracking-[2px] font-light text-white leading-tight reveal-target delay-100">
+            Elevating the standard of <br/><span className="font-bold text-gradient-gold">Bespoke Horology</span>
+          </h2>
+          <p className="font-sans text-gray-400 text-base md:text-xl leading-[2] tracking-wide font-light max-w-[800px] reveal-target delay-200">
+            HY Watches provides perfectly customized timepieces tailored to the exact specifications of the modern connoisseur. Beyond customization, we source, appraise, and procure genuine luxury items across the globe.
+          </p>
+        </div>
+      </section>
+
       <section className="relative w-full py-32 bg-[#0a0a0a] border-t border-white/5">
         <div className="max-w-[1600px] mx-auto px-6 md:px-12">
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 reveal-target">
@@ -458,8 +883,8 @@ export function HomePage() {
               <h3 className="font-serif uppercase text-4xl md:text-5xl text-white font-bold tracking-[2px]">FEATURED SERIES</h3>
             </div>
             <div className="hidden md:flex space-x-4">
-              <button onClick={prevCollectionSlide} className="w-14 h-14 border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-[#c5a059] hover:text-black hover:border-[#c5a059] transition-all"><ChevronLeft size={20} /></button>
-              <button onClick={nextCollectionSlide} className="w-14 h-14 border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-[#c5a059] hover:text-black hover:border-[#c5a059] transition-all"><ChevronRight size={20} /></button>
+              <button onClick={prevCollectionSlide} className="w-14 h-14 border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-white hover:text-black hover:border-[#c5a059] transition-all"><ChevronLeft size={20} /></button>
+              <button onClick={nextCollectionSlide} className="w-14 h-14 border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-white hover:text-black hover:border-[#c5a059] transition-all"><ChevronRight size={20} /></button>
             </div>
           </div>
           <div className="relative overflow-hidden w-full reveal-target delay-200">
@@ -480,14 +905,9 @@ export function HomePage() {
               ))}
             </div>
           </div>
-          <div className="flex justify-center space-x-4 mt-10 md:hidden">
-            <button onClick={prevCollectionSlide} className="w-12 h-12 border border-white/20 rounded-full flex items-center justify-center text-white active:bg-white active:text-black transition-all"><ChevronLeft size={20} /></button>
-            <button onClick={nextCollectionSlide} className="w-12 h-12 border border-white/20 rounded-full flex items-center justify-center text-white active:bg-white active:text-black transition-all"><ChevronRight size={20} /></button>
-          </div>
         </div>
       </section>
 
-      {/* LATEST ARRIVALS */}
       <section className="relative w-full py-32 bg-[#030303] overflow-hidden">
         <div className="ambient-light bg-[#c5a059] w-[40vw] h-[40vw] top-0 left-[-20vw] parallax-layer" data-speed="0.2"></div>
         <div className="max-w-[1400px] mx-auto px-6 relative z-10">
@@ -499,18 +919,23 @@ export function HomePage() {
             {WATCH_DATABASE.slice(0, 4).map((product, index) => (
               <div key={product.id} className={`group cursor-pointer flex flex-col bg-transparent p-4 transition-all duration-500 reveal-target delay-${(index % 4) * 100}`}>
                 <div className="relative aspect-[4/5] overflow-hidden bg-[#0a0a0a] mb-6 rounded-sm border border-white/5 group-hover:border-white/20 transition-colors">
-                  <img src={product.image} className="absolute inset-0 w-full h-full object-contain p-8 transition-all duration-700 opacity-100 group-hover:scale-110 ease-out" alt={product.title} />
+                  <img src={product.image} className="absolute inset-0 w-full h-full object-contain p-8 transition-all duration-700 opacity-100 group-hover:opacity-0 group-hover:scale-110 ease-out" alt={product.title} />
+                  <img src={product.images?.[1] || product.image} className="absolute inset-0 w-full h-full object-cover opacity-0 transition-all duration-700 group-hover:opacity-100 scale-100 group-hover:scale-105 ease-out" alt={`${product.title} alt`} />
                   <div className="absolute top-4 left-4 flex flex-col gap-2 z-20"><span className="bg-white text-black text-[9px] font-bold px-3 py-1.5 uppercase tracking-[2px]">{product.tag}</span></div>
-                  <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10 backdrop-blur-sm">
-                    <button className="btn-gold !px-6 !py-3 !text-[10px]" onClick={() => addToCart(product)}>
-                      <span className="relative z-10 font-bold tracking-[2px]">ACQUIRE ASSET</span>
-                    </button>
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10 backdrop-blur-sm" onClick={() => {
+                      const event = new CustomEvent('openProductModal', { detail: product });
+                      window.dispatchEvent(event);
+                  }}>
+                    <div className="transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 flex flex-col items-center">
+                      <span className="w-12 h-12 rounded-full border border-white flex items-center justify-center text-white mb-3 hover:bg-white hover:text-black transition-colors"><Search size={16} /></span>
+                      <span className="font-serif text-xs uppercase tracking-[2px] text-white font-medium">Quick View</span>
+                    </div>
                   </div>
                 </div>
                 <div className="flex flex-col flex-grow text-center px-2">
                   <span className="font-serif text-[10px] text-gray-500 uppercase tracking-[2px] mb-2 block">{product.specs.material}</span>
                   <h4 className="font-mono text-[13px] leading-[1.6] text-gray-300 transition-colors duration-300 group-hover:text-white line-clamp-2 mb-4 font-light">{product.model}</h4>
-                  <p className="font-serif text-lg font-bold text-white mt-auto tracking-wide border-t border-white/10 pt-4">${product.price},000</p>
+                  <p className="font-serif text-xl font-bold text-white mt-auto tracking-wide border-t border-white/10 pt-4">${product.price},000</p>
                 </div>
               </div>
             ))}
@@ -523,8 +948,32 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* SOCIAL SHOWCASE */}
-      <section className="relative w-full py-32 bg-[#0a0a0a] overflow-hidden border-t border-white/5">
+      <section className="relative w-full py-32 bg-[#0a0a0a]">
+        <div className="max-w-[1600px] mx-auto px-6 md:px-12">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-16 reveal-target">
+            <div className="max-w-[600px]">
+              <span className="text-[#c5a059] text-[11px] tracking-[4px] uppercase font-serif block mb-4">Brand Portfolio</span>
+              <h3 className="font-serif uppercase text-4xl md:text-5xl text-white font-bold tracking-[2px] mb-6">MANUFACTURES</h3>
+              <p className="font-sans text-gray-400 font-light leading-relaxed">Partnering exclusively with the world's most prestigious horological houses. Each brand represents a unique philosophy in watchmaking history.</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-4 h-auto md:h-[800px] reveal-target delay-200">
+            {collectionGrid.map((item, idx) => (
+              <div key={idx} className={`relative overflow-hidden group cursor-pointer bg-[#050505] ${item.colSpan} min-h-[350px] md:min-h-[auto]`}>
+                <img src={item.img} className="absolute inset-0 w-full h-full object-cover opacity-50 transition-transform duration-[3s] ease-out group-hover:scale-110 group-hover:opacity-80" alt={item.title} />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent transition-opacity duration-700 opacity-90 group-hover:opacity-60"></div>
+                <div className="absolute bottom-10 left-10 right-10 z-10 flex flex-col items-start transform transition-transform duration-500">
+                  <span className="text-[#c5a059] text-[10px] md:text-[11px] tracking-[3px] uppercase mb-2 font-sans font-bold">{item.subtitle}</span>
+                  <h2 className="font-serif text-white uppercase text-2xl md:text-3xl font-bold tracking-[3px] leading-tight">{item.title}</h2>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="relative w-full py-32 bg-[#030303] overflow-hidden">
+        <div className="ambient-light bg-white/5 w-[50vw] h-[50vw] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 parallax-layer" data-speed="0.1"></div>
         <div className="max-w-[1400px] mx-auto px-6 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 lg:gap-8 mb-24">
             <div className="flex flex-col justify-center lg:pr-12 reveal-target">
@@ -532,7 +981,6 @@ export function HomePage() {
               <h3 className="font-serif uppercase text-4xl text-white font-bold mb-8 tracking-[2px] leading-tight">HY ON SOCIAL</h3>
               <div className="w-10 h-[1px] bg-white/20 mb-8"></div>
               <p className="font-sans text-gray-400 leading-[1.8] mb-6 text-[15px] font-light">Follow <strong className="text-white font-medium">HY Watches</strong> across digital platforms for unboxing sequences, macro reviews, and arrival alerts.</p>
-              <p className="font-sans text-gray-400 leading-[1.8] text-[15px] font-light mb-8">Every piece is filmed raw, allowing you to observe finishing, proportions, and wrist presence.</p>
             </div>
             {socialMediaVideos.map((social, idx) => (
               <div key={idx} className={`flex flex-col reveal-target delay-${(idx + 1) * 100}`}>
@@ -544,7 +992,11 @@ export function HomePage() {
                   <video ref={el => videoRefs.current[idx + 1] = el} className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:scale-110 transition-transform duration-[2s] ease-out group-hover:opacity-100" preload="auto" playsInline autoPlay muted loop>
                     <source src={social.videoSrc} type="video/mp4" />
                   </video>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 opacity-100 group-hover:opacity-0 transition-opacity duration-500 pointer-events-none"></div>
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="w-16 h-16 rounded-full border border-white/20 flex items-center justify-center text-white glass-panel group-hover:bg-[#c5a059] group-hover:text-black transition-all transform group-hover:scale-110 shadow-2xl">
+                      <Play size={20} className="ml-1 fill-current" />
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
@@ -560,12 +1012,15 @@ export function ShopPage() {
   const [filter, setFilter] = useState('ALL');
   const brands = ['ALL', 'Richard Mille', 'Rolex', 'Patek Philippe', 'Audemars Piguet', 'Hublot'];
   const filteredWatches = filter === 'ALL' ? WATCH_DATABASE : WATCH_DATABASE.filter(w => w.brand === filter);
+  useScrollReveal();
 
   return (
     <div className="w-full flex flex-col pt-[120px] bg-[#030303] min-h-screen">
       <div className="max-w-[1600px] mx-auto w-full px-6 py-12 flex flex-col lg:flex-row gap-12">
         <div className="w-full lg:w-[280px] flex-shrink-0 border-r border-white/5 pr-8 reveal-target">
-          <h2 className="font-serif uppercase text-2xl tracking-[2px] mb-8 pb-4 border-b border-white/10 flex items-center">INVENTORY</h2>
+          <h2 className="font-serif uppercase text-2xl tracking-[2px] mb-8 pb-4 border-b border-white/10 flex items-center">
+            <SlidersHorizontal size={18} className="mr-3 text-[#c5a059]"/> INVENTORY
+          </h2>
           <div className="space-y-8">
             <div>
               <h3 className="text-xs uppercase tracking-[2px] text-gray-500 mb-4 font-bold">Manufacture</h3>
@@ -598,9 +1053,18 @@ export function ShopPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {filteredWatches.map((watch, i) => (
               <div key={watch.id} className={`bg-[#0a0a0a] border border-white/5 p-5 group flex flex-col h-full reveal-target delay-${(i % 3) * 100}`}>
-                <div className="relative aspect-square bg-[#111] mb-6 overflow-hidden flex items-center justify-center">
+                <div 
+                  className="relative aspect-square bg-[#111] mb-6 overflow-hidden flex items-center justify-center cursor-pointer"
+                  onClick={() => {
+                    const event = new CustomEvent('openProductModal', { detail: watch });
+                    window.dispatchEvent(event);
+                  }}
+                >
                   <img src={watch.image} className="w-[80%] h-[80%] object-contain transition-transform duration-700 group-hover:scale-110" />
                   <div className="absolute top-3 left-3"><span className="bg-white text-black text-[9px] font-bold px-2 py-1 uppercase tracking-[2px]">{watch.tag}</span></div>
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                    <span className="w-12 h-12 rounded-full border border-white flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors"><Search size={16} /></span>
+                  </div>
                 </div>
                 <div className="flex flex-col flex-grow">
                   <div className="flex justify-between items-start mb-2">
@@ -628,6 +1092,8 @@ export function ShopPage() {
 }
 
 export function AboutPage() {
+  useScrollReveal();
+
   return (
     <div className="w-full pt-[120px] bg-[#030303] text-white min-h-screen pb-32">
       <div className="max-w-[1000px] mx-auto px-6 pt-20 text-center reveal-target">
@@ -664,6 +1130,7 @@ export function AboutPage() {
 export function ContactPage() {
   const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
+  useScrollReveal();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -744,47 +1211,131 @@ export function ContactPage() {
   );
 }
 
-function Layout() {
-  const { currentRoute } = useAppContext();
-  const [preloaderActive, setPreloaderActive] = useState(true);
+export function WarrantyPage() {
+  useScrollReveal();
+  useEffect(() => { window.scrollTo(0,0); }, []);
+
+  return (
+    <div className="w-full pt-[120px] bg-[#030303] text-white min-h-screen pb-32">
+      <div className="max-w-[1000px] mx-auto px-6 py-20">
+        <div className="text-center mb-20 reveal-target">
+          <span className="text-[#c5a059] text-[11px] tracking-[4px] uppercase font-serif block mb-4">Client Protection</span>
+          <h1 className="text-4xl md:text-6xl font-serif font-bold uppercase tracking-[2px]">WARRANTY MATRIX</h1>
+        </div>
+        <div className="bg-[#0a0a0a] border border-white/5 p-8 md:p-16 reveal-target space-y-12">
+          <div>
+            <h3 className="font-serif uppercase tracking-[2px] text-xl mb-4 text-[#c5a059]">I. Mechanical Coverage</h3>
+            <p className="text-gray-400 font-light leading-relaxed text-sm">
+              HY Watches provides a comprehensive 24-month mechanical warranty covering manufacturing defects, caliber anomalies, and movement regulation deviations outside of factory chronometric standards. This coverage activates strictly from the date of physical delivery verification.
+            </p>
+          </div>
+          <div>
+            <h3 className="font-serif uppercase tracking-[2px] text-xl mb-4 text-[#c5a059]">II. Exclusions and Voidance</h3>
+            <p className="text-gray-400 font-light leading-relaxed text-sm mb-4">The warranty matrix categorically excludes the following conditions:</p>
+            <ul className="list-disc list-inside text-gray-400 font-light text-sm space-y-2 pl-4">
+              <li>Water ingress damage resulting from improper crown security or submersion beyond specified depth ratings.</li>
+              <li>Impact trauma, dropping, or extreme kinetic shock to the case, crystal, or movement.</li>
+              <li>Magnetic magnetization requiring demagnetization servicing.</li>
+              <li>General aesthetic wear, including scratches to bracelets, clasps, or precious metal components.</li>
+            </ul>
+            <p className="text-red-400/80 font-mono text-xs mt-6 p-4 bg-red-900/10 border border-red-900/30">
+              CRITICAL: Unauthorized access to the case back or physical intervention by third-party watchmakers immediately and irrevocably voids all HY Watches warranty coverage.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function TermsPage() {
+  useScrollReveal();
+  useEffect(() => { window.scrollTo(0,0); }, []);
+
+  return (
+    <div className="w-full pt-[120px] bg-[#030303] text-white min-h-screen pb-32">
+      <div className="max-w-[1000px] mx-auto px-6 py-20">
+        <div className="text-center mb-20 reveal-target">
+          <span className="text-[#c5a059] text-[11px] tracking-[4px] uppercase font-serif block mb-4">Legal Architecture</span>
+          <h1 className="text-4xl md:text-6xl font-serif font-bold uppercase tracking-[2px]">TERMS OF SERVICE</h1>
+        </div>
+        <div className="bg-[#0a0a0a] border border-white/5 p-8 md:p-16 reveal-target space-y-12">
+          <div>
+            <h3 className="font-serif uppercase tracking-[2px] text-xl mb-4 text-[#c5a059]">1. Asset Procurement and Capital Transfer</h3>
+            <p className="text-gray-400 font-light leading-relaxed text-sm">
+              All acquisitions require 100% capital clearance prior to dispatch. Accepted networks include Bank Wire Transfer and verified Cryptocurrency networks (BTC/USDT). Timepieces remain the strict property of HY Watches until financial clearing is fully settled within our corporate escrow.
+            </p>
+          </div>
+          <div>
+            <h3 className="font-serif uppercase tracking-[2px] text-xl mb-4 text-[#c5a059]">2. Global Logistics & Liability</h3>
+            <p className="text-gray-400 font-light leading-relaxed text-sm">
+              HY Watches assumes full liability for the physical asset while in transit via our authorized FedEx/DHL Priority networks. Liability formally transfers to the client at the exact timestamp of courier delivery verification. The acquiring party assumes total responsibility for all international customs declarations, import tariffs, and localized taxation.
+            </p>
+          </div>
+          <div>
+            <h3 className="font-serif uppercase tracking-[2px] text-xl mb-4 text-[#c5a059]">3. Return Logistics</h3>
+            <p className="text-gray-400 font-light leading-relaxed text-sm">
+              Returns are permissible strictly within 7 calendar days of delivery. The asset must remain unworn, unsized, and fully encased in original factory protective polymers. The client bears all return logistics costs and transit insurance liability. Customized, engraved, or diamond-set pieces are categorically deemed final sale.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ==========================================
+// ROOT INJECTION
+// ==========================================
+
+export function Layout() {
+  const { currentRoute, isCartOpen, setCartOpen } = useAppContext();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => setPreloaderActive(false), 1500);
-    return () => clearTimeout(timer);
+    const handleOpenModal = (e: CustomEvent) => {
+      setSelectedProduct(e.detail);
+      setModalOpen(true);
+    };
+    window.addEventListener('openProductModal' as any, handleOpenModal);
+    return () => window.removeEventListener('openProductModal' as any, handleOpenModal);
   }, []);
+
+  const renderRoute = () => {
+    switch (currentRoute) {
+      case 'HOME': return <HomePage />;
+      case 'SHOP': return <ShopPage />;
+      case 'ABOUT': return <AboutPage />;
+      case 'CONTACT': return <ContactPage />;
+      case 'WARRANTY': return <WarrantyPage />;
+      case 'TERMS': return <TermsPage />;
+      default: return <HomePage />;
+    }
+  };
 
   return (
     <>
       <GlobalStyles />
+      <CustomCursor />
       
-      {/* INITIAL LOAD SEQUENCE */}
-      <div className={`fixed inset-0 z-[9999] bg-[#030303] flex items-center justify-center transition-opacity duration-1000 ${preloaderActive ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-        <div className="flex flex-col items-center">
-          <div className="w-[2px] h-12 bg-white/20 relative overflow-hidden mb-6">
-            <div className="absolute top-0 left-0 w-full h-full bg-[#c5a059] animate-[slideDown_1.5s_ease-in-out_infinite]"></div>
-          </div>
-          <span className="font-serif text-[#c5a059] tracking-[8px] text-sm uppercase">HY Watches</span>
-        </div>
-        <style dangerouslySetInnerHTML={{__html: `
-          @keyframes slideDown { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
-        `}} />
+      <div className="fixed right-6 bottom-8 z-[90] flex flex-col gap-4 reveal-target delay-400">
+        <a href="mailto:info.hywatches@gmail.com" className="w-12 h-12 rounded-full flex items-center justify-center shadow-[0_10px_30px_rgba(0,0,0,0.8)] transition-all duration-300 hover:scale-110 bg-[#0a0a0a] border border-white/10 text-white hover:border-[#c5a059] hover:bg-[#c5a059] hover:text-black group">
+          <MessageCircle size={18} />
+        </a>
+        <a href="#" className="w-12 h-12 rounded-full flex items-center justify-center shadow-[0_10px_30px_rgba(0,0,0,0.8)] transition-all duration-300 hover:scale-110 bg-[#0a0a0a] border border-white/10 text-white hover:border-[#c5a059] hover:bg-[#c5a059] hover:text-black group">
+          <Instagram size={18} />
+        </a>
       </div>
 
       <Header />
       <MobileMenu />
       <CartDrawer />
+      <ProductModal isOpen={modalOpen} product={selectedProduct} onClose={() => setModalOpen(false)} />
+      <SecureCheckout isOpen={isCartOpen && currentRoute === 'CHECKOUT'} onClose={() => setCartOpen(false)} />
       
-      <main className="flex-grow flex flex-col min-h-screen">
-        {/* 
-          AWAITING COMPONENT INJECTIONS
-          Execute Step 2 to generate Home.tsx, Shop.tsx, About.tsx, Contact.tsx 
-        */}
-        <div className="w-full flex-grow flex items-center justify-center pt-[120px]">
-          <div className="text-center">
-            <h2 className="font-serif uppercase tracking-[4px] text-2xl text-gray-500 mb-4">Architecture Initialized</h2>
-            <p className="font-sans font-light text-gray-600">Awaiting modular page injections for route: <strong className="text-white">{currentRoute}</strong></p>
-          </div>
-        </div>
+      <main className="flex-grow flex flex-col min-h-screen relative z-10">
+        {renderRoute()}
       </main>
 
       <Footer />

@@ -28,7 +28,7 @@ const collectionGrid = [
 export default function App() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const videoWrapperRef = useRef<HTMLDivElement>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY >= 50)
@@ -44,12 +44,22 @@ export default function App() {
     
     document.querySelectorAll('.reveal-on-scroll').forEach((el) => observer.observe(el))
 
-    if (videoWrapperRef.current) {
-      const heroVideo = videoWrapperRef.current.querySelector('video')
-      if (heroVideo) {
-        heroVideo.defaultMuted = true
-        heroVideo.muted = true
-        heroVideo.play().catch(() => {})
+    const videoElement = videoRef.current
+    if (videoElement) {
+      videoElement.defaultMuted = true
+      videoElement.muted = true
+      
+      const playPromise = videoElement.play()
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          const forcePlayOnInteraction = () => {
+            videoElement.play()
+            document.removeEventListener('touchstart', forcePlayOnInteraction)
+            document.removeEventListener('click', forcePlayOnInteraction)
+          }
+          document.addEventListener('touchstart', forcePlayOnInteraction, { once: true })
+          document.addEventListener('click', forcePlayOnInteraction, { once: true })
+        })
       }
     }
 
@@ -175,15 +185,18 @@ export default function App() {
       <main className="flex-grow w-full pt-0">
         
         <div className="relative w-full h-[100svh] bg-[#050505] overflow-hidden flex items-center justify-center">
-          <div 
-            ref={videoWrapperRef}
-            className="absolute inset-0 w-full h-full"
-            dangerouslySetInnerHTML={{ __html: `
-              <video class="w-full h-full object-cover opacity-60 slow-zoom pointer-events-none" preload="auto" playsinline="true" webkit-playsinline="true" autoplay="true" muted="true" loop="true" poster="https://lucytimepieces.com/wp-content/uploads/2026/03/rolex-daytona-116500ln-stainless-steel-white-panda-dial-2018-rolex-1212087379.jpg">
-                <source src="https://lucytimepieces.com/wp-content/uploads/2026/03/02.mp4" type="video/mp4" />
-              </video>
-            `}} 
-          />
+          <video 
+            ref={videoRef}
+            className="absolute inset-0 w-full h-full object-cover opacity-60 slow-zoom pointer-events-none" 
+            preload="auto" 
+            playsInline 
+            autoPlay 
+            muted 
+            loop 
+            poster="https://lucytimepieces.com/wp-content/uploads/2026/03/rolex-daytona-116500ln-stainless-steel-white-panda-dial-2018-rolex-1212087379.jpg"
+          >
+            <source src="https://lucytimepieces.com/wp-content/uploads/2026/03/02.mp4" type="video/mp4" />
+          </video>
           <div className="absolute inset-0 bg-gradient-to-b from-[#030303]/80 via-transparent to-[#030303]"></div>
           
           <div className="relative z-10 text-center px-5 max-w-[900px] flex flex-col items-center mt-12 md:mt-0">

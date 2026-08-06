@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import { ChevronDown, Search, Globe, ShoppingBag, Menu, ChevronLeft, ChevronRight, Star, Play, Package, CreditCard, ShieldCheck, X, Instagram, Facebook, ArrowRight } from 'lucide-react'
 
 const popularCollections = [
@@ -28,7 +28,6 @@ const collectionGrid = [
 export default function App() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY >= 50)
@@ -43,10 +42,6 @@ export default function App() {
     }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' })
     
     document.querySelectorAll('.reveal-on-scroll').forEach((el) => observer.observe(el))
-    
-    if (videoRef.current) {
-      videoRef.current.play().catch(error => console.log("Video autoplay blocked by browser policy.", error))
-    }
 
     return () => {
       window.removeEventListener('scroll', handleScroll)
@@ -170,17 +165,14 @@ export default function App() {
       <main className="flex-grow w-full pt-0">
         
         <div className="relative w-full h-[100svh] bg-[#050505] overflow-hidden flex items-center justify-center">
-          <video 
-            ref={videoRef}
-            className="absolute inset-0 w-full h-full object-cover opacity-60 slow-zoom pointer-events-none" 
-            preload="metadata" 
-            playsInline 
-            autoPlay 
-            muted 
-            loop
-          >
-            <source src="https://lucytimepieces.com/wp-content/uploads/2026/03/02.mp4" type="video/mp4" />
-          </video>
+          <div 
+            className="absolute inset-0 w-full h-full"
+            dangerouslySetInnerHTML={{ __html: `
+              <video class="w-full h-full object-cover opacity-60 slow-zoom pointer-events-none" preload="auto" playsinline autoplay muted loop>
+                <source src="https://lucytimepieces.com/wp-content/uploads/2026/03/02.mp4" type="video/mp4" />
+              </video>
+            `}} 
+          />
           <div className="absolute inset-0 bg-gradient-to-b from-[#030303]/80 via-transparent to-[#030303]"></div>
           
           <div className="relative z-10 text-center px-5 max-w-[900px] flex flex-col items-center mt-12 md:mt-0">

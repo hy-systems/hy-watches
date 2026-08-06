@@ -44,7 +44,6 @@ export default function App() {
     
     document.querySelectorAll('.reveal-on-scroll').forEach((el) => observer.observe(el))
     
-    // Force video playback for iOS low power mode and strict policies
     if (videoRef.current) {
       videoRef.current.play().catch(error => console.log("Video autoplay blocked by browser policy.", error))
     }
@@ -394,7 +393,7 @@ export default function App() {
             <div className="flex flex-col md:col-span-3 text-center sm:text-left">
               <h3 className="font-sans uppercase tracking-[3px] md:tracking-[4px] text-[9px] md:text-[10px] text-gray-400 mb-6 md:mb-8 font-normal">Contact Desk</h3>
               <div className="font-sans text-gray-500 text-[11px] md:text-[12px] space-y-4 md:space-y-6 font-light">
-                <p>Boronia, Victoria<br/>Australia</p>
+                <p>Melbourne, Victoria<br/>Australia</p>
                 <p><a href="mailto:info.hywatches@gmail.com" className="hover:text-white transition-colors">info.hywatches@gmail.com</a></p>
                 <p>WhatsApp: (+61) 000 000 000</p>
               </div>

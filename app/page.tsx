@@ -41,8 +41,10 @@ const collection = [
 export default function LuxuryHomePage() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const { scrollY } = useScroll();
-  const heroOpacity = useTransform(scrollY, [0, 600], [1, 0]);
-  const heroY = useTransform(scrollY, [0, 600], [0, 150]);
+  const heroOpacity = useTransform(scrollY, [0, 500], [1, 0]);
+  const heroY = useTransform(scrollY, [0, 500], [0, 100]);
+  const lineY = useTransform(scrollY, [0, 300], [0, 50]);
+  const lineOpacity = useTransform(scrollY, [0, 300], [1, 0]);
 
   useEffect(() => {
     const updateMousePosition = (e: MouseEvent) => {
@@ -55,110 +57,102 @@ export default function LuxuryHomePage() {
   const ease = [0.76, 0, 0.24, 1];
 
   return (
-    <>
+    <main className="bg-[#050505] min-h-screen text-white selection:bg-[#D4AF37] selection:text-black">
       <motion.div
         className="fixed top-0 left-0 w-6 h-6 border border-[#D4AF37] rounded-full pointer-events-none z-[9999] mix-blend-difference"
         animate={{ x: mousePosition.x - 12, y: mousePosition.y - 12 }}
         transition={{ type: "spring", stiffness: 500, damping: 28, mass: 0.5 }}
       />
 
-      <section className="relative min-h-[100dvh] flex flex-col items-center justify-center overflow-hidden pt-20 bg-[#050505]">
+      <section className="relative min-h-[100dvh] flex flex-col items-center justify-center overflow-hidden pt-20">
         <motion.div 
           style={{ opacity: heroOpacity, y: heroY }}
-          className="z-10 flex flex-col items-center text-center px-6"
+          className="z-10 flex flex-col items-center text-center px-6 w-full"
         >
           <motion.div
-            initial={{ opacity: 0, filter: "blur(10px)", y: 40 }}
-            animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
-            transition={{ duration: 1.5, ease }}
+            initial={{ opacity: 0, y: 60 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.8, ease }}
           >
-            <h1 className="text-[clamp(3rem,8vw,7rem)] leading-[0.95] text-white font-serif tracking-tight">
-              Precision timepieces.
+            <h1 className="text-[clamp(3.5rem,10vw,8rem)] leading-[0.85] font-serif tracking-tight text-[#EAEAEA]">
+              Precision
             </h1>
-            <h1 className="text-[clamp(3rem,8vw,7rem)] leading-[0.95] text-[#888888] italic mt-2 font-serif tracking-tight">
-              Uncompromised sourcing.
+            <h1 className="text-[clamp(3.5rem,10vw,8rem)] leading-[0.85] font-serif tracking-tight text-[#D4AF37] italic mt-4 md:mt-2">
+              Uncompromised.
             </h1>
           </motion.div>
 
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 1.5, delay: 0.4, ease }}
-            className="mt-10 max-w-lg text-[#A0A0A0] text-base leading-relaxed font-light"
+            transition={{ duration: 2, delay: 0.5, ease }}
+            className="mt-12 max-w-md text-[#888] text-[0.85rem] leading-loose font-light tracking-wide uppercase"
           >
-            Engineered for those who know the difference. Anonymous settlement. Flawless execution. Access 1:1 factory builds without retail friction.
+            Anonymous settlement. Flawless execution. Access 1:1 factory builds without retail friction.
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.5, delay: 0.6, ease }}
-            className="mt-14 flex items-center gap-10"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 2, delay: 0.8, ease }}
+            className="mt-16 flex items-center gap-12"
           >
-            <a href="https://wa.me/yourwhatsappnumber" className="group relative px-8 py-4 border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black overflow-hidden transition-all duration-500">
-              <span className="relative z-10 text-[0.75rem] uppercase tracking-[0.2em] font-medium">WhatsApp Inquiry</span>
-            </a>
-            <a href="mailto:contact@hywatches.com.au" className="relative group text-[0.75rem] uppercase tracking-[0.2em] text-[#888888] hover:text-white transition-colors pb-1">
-              Email Desk
-              <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-white transition-all duration-500 group-hover:w-full"></span>
+            <a href="https://wa.me/yourwhatsappnumber" className="group relative px-10 py-4 border border-[#D4AF37]/30 hover:border-[#D4AF37] transition-all duration-700 ease-out">
+              <span className="relative z-10 text-[0.65rem] uppercase tracking-[0.3em] font-medium text-[#D4AF37]">Secure Allocation</span>
+              <div className="absolute inset-0 bg-[#D4AF37] scale-y-0 origin-bottom group-hover:scale-y-100 transition-transform duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] z-0" />
+              <span className="absolute inset-0 z-20 flex items-center justify-center text-[0.65rem] uppercase tracking-[0.3em] font-medium text-black opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-100">Secure Allocation</span>
             </a>
           </motion.div>
         </motion.div>
+
+        <motion.div 
+          style={{ opacity: lineOpacity, y: lineY }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4"
+        >
+          <span className="text-[9px] uppercase tracking-[0.4em] text-[#555] rotate-90 mb-6">Scroll</span>
+          <div className="w-[1px] h-16 bg-gradient-to-b from-[#D4AF37] to-transparent" />
+        </motion.div>
       </section>
 
-      <section className="py-8 border-y border-white/10 bg-[#0A0A0A] overflow-hidden ticker-mask">
-        <div className="flex w-max animate-ticker">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="flex items-center">
-              <span className="text-[0.7rem] uppercase tracking-[0.2em] text-[#555] mx-8 font-mono">ROLEX</span>
-              <span className="text-[#D4AF37] text-xs">♦</span>
-              <span className="text-[0.7rem] uppercase tracking-[0.2em] text-[#555] mx-8 font-mono">PATEK PHILIPPE</span>
-              <span className="text-[#D4AF37] text-xs">♦</span>
-              <span className="text-[0.7rem] uppercase tracking-[0.2em] text-[#555] mx-8 font-mono">AUDEMARS PIGUET</span>
-              <span className="text-[#D4AF37] text-xs">♦</span>
-              <span className="text-[0.7rem] uppercase tracking-[0.2em] text-[#555] mx-8 font-mono">CARTIER</span>
-              <span className="text-[#D4AF37] text-xs">♦</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="py-40 px-6 max-w-[1400px] mx-auto bg-[#050505]">
-        <div className="text-center mb-24">
-          <span className="text-[#D4AF37] text-[10px] uppercase tracking-[0.2em] font-mono">The Collection</span>
-          <h2 className="text-4xl md:text-5xl mt-6 text-white font-serif">Four references. One standard.</h2>
+      <section className="py-56 px-6 max-w-[1200px] mx-auto">
+        <div className="flex flex-col items-center text-center mb-40">
+          <span className="text-[#D4AF37] text-[9px] uppercase tracking-[0.4em] mb-8">The Collection</span>
+          <h2 className="text-[clamp(2rem,5vw,4rem)] text-white font-serif leading-tight">Mastery in replication.</h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="flex flex-col gap-40 md:gap-56">
           {collection.map((watch, i) => (
             <motion.div 
               key={watch.ref}
-              initial={{ opacity: 0, y: 40 }}
+              initial={{ opacity: 0, y: 100 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 1, delay: i * 0.1, ease }}
-              className="group relative bg-[#0A0A0A] border border-white/5 p-12 overflow-hidden hover:border-[#D4AF37]/30 transition-colors duration-700"
+              viewport={{ once: true, margin: "-150px" }}
+              transition={{ duration: 1.5, ease }}
+              className={`flex flex-col ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} items-center gap-16 md:gap-32`}
             >
-              <div className="flex justify-between items-center z-10 relative text-[10px] uppercase tracking-[0.2em] font-mono text-[#555]">
-                <span>REF. {watch.ref}</span>
-                <span>{watch.brand}</span>
+              <div className="w-full md:w-1/2 flex justify-center relative group">
+                <div className="absolute inset-0 bg-[#D4AF37]/0 group-hover:bg-[#D4AF37]/10 rounded-full blur-[100px] transition-colors duration-1000" />
+                <div className="w-64 h-64 md:w-96 md:h-96 border border-white/5 rounded-full flex items-center justify-center text-[#333] text-xs relative z-10 group-hover:scale-105 transition-transform duration-[1.5s] ease-out">
+                  [WATCH ASSET {watch.ref}]
+                </div>
               </div>
 
-              <div className="h-[350px] w-full flex items-center justify-center my-12 relative z-10">
-                <div className="absolute inset-0 bg-[#D4AF37]/0 group-hover:bg-[#D4AF37]/5 rounded-full blur-3xl transition-colors duration-1000" />
-                <div className="w-48 h-48 border border-white/10 rounded-full flex items-center justify-center text-[#333] text-xs group-hover:scale-105 transition-transform duration-1000">[WATCH ASSET]</div>
-              </div>
-
-              <div className="relative z-10 border-t border-white/5 pt-8">
-                <h3 className="text-2xl text-white mb-6 font-serif">{watch.model}</h3>
-                <div className="grid grid-cols-2 gap-4 text-[10px] font-mono tracking-[0.1em]">
-                  <div>
-                    <div className="text-[#555] mb-1">MOVEMENT</div>
-                    <div className="text-[#EAEAEA]">{watch.movement}</div>
+              <div className="w-full md:w-1/2 flex flex-col items-start">
+                <div className="flex items-center gap-4 mb-8">
+                  <span className="w-8 h-[1px] bg-[#D4AF37]" />
+                  <span className="text-[9px] uppercase tracking-[0.4em] text-[#D4AF37]">REF. {watch.ref}</span>
+                </div>
+                <h4 className="text-[10px] uppercase tracking-[0.3em] text-[#888] mb-2">{watch.brand}</h4>
+                <h3 className="text-4xl md:text-5xl text-white font-serif mb-12">{watch.model}</h3>
+                
+                <div className="grid grid-cols-1 gap-8 w-full border-t border-white/10 pt-8">
+                  <div className="flex flex-col">
+                    <span className="text-[9px] uppercase tracking-[0.3em] text-[#555] mb-2">Movement</span>
+                    <span className="text-sm text-[#EAEAEA] font-light tracking-wide">{watch.movement}</span>
                   </div>
-                  <div>
-                    <div className="text-[#555] mb-1">CASE</div>
-                    <div className="text-[#EAEAEA]">{watch.case}</div>
+                  <div className="flex flex-col">
+                    <span className="text-[9px] uppercase tracking-[0.3em] text-[#555] mb-2">Architecture</span>
+                    <span className="text-sm text-[#EAEAEA] font-light tracking-wide">{watch.case}</span>
                   </div>
                 </div>
               </div>
@@ -167,39 +161,42 @@ export default function LuxuryHomePage() {
         </div>
       </section>
 
-      <section className="py-40 bg-[#0A0A0A] border-y border-white/5">
-        <div className="max-w-[1400px] mx-auto px-6 grid grid-cols-1 md:grid-cols-12 gap-16 md:gap-8">
-          <div className="md:col-span-4">
-            <span className="text-[#D4AF37] text-[10px] uppercase tracking-[0.2em] font-mono">Operations</span>
-            <h2 className="text-4xl text-white mt-6 leading-tight font-serif">
-              Controlled at every handoff.
-            </h2>
-          </div>
-          
-          <div className="md:col-span-7 md:col-start-6 flex flex-col gap-16">
-            {[
-              { label: "QUALITY CONTROL / SOURCING", value: "3 to 5 Days", desc: "Factory sourcing, inspection, movement validation, and final photographic verification before dispatch." },
-              { label: "CUSTOMS RISK CONTROL", value: "Triangular Routing", desc: "Low-risk transit through established intermediate hubs, including Germany or the United Kingdom." },
-              { label: "TOTAL TRANSIT", value: "10 to 20 Days", desc: "Measured from confirmed dispatch through routing and final delivery to your destination." }
-            ].map((stat, i) => (
-              <motion.div 
-                key={i}
-                initial={{ opacity: 0, x: 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 1, delay: i * 0.1, ease }}
-                className="border-b border-white/5 pb-12"
-              >
-                <div className="text-[10px] uppercase tracking-[0.2em] font-mono text-[#555] mb-4">{stat.label}</div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-baseline">
-                  <div className="text-4xl md:text-5xl text-white tracking-tight">{stat.value}</div>
-                  <div className="text-[#888888] text-sm leading-relaxed">{stat.desc}</div>
-                </div>
-              </motion.div>
-            ))}
+      <section className="py-40 bg-[#020202]">
+        <div className="max-w-[1200px] mx-auto px-6">
+          <div className="flex flex-col md:flex-row justify-between items-start gap-20">
+            <div className="md:w-1/3 sticky top-40">
+              <span className="text-[#D4AF37] text-[9px] uppercase tracking-[0.4em] mb-6 block">Acquisition</span>
+              <h2 className="text-4xl md:text-5xl text-white font-serif leading-tight">
+                Secure logistics.
+              </h2>
+            </div>
+            
+            <div className="md:w-1/2 flex flex-col gap-24 relative">
+              <div className="absolute left-[3px] top-2 bottom-0 w-[1px] bg-gradient-to-b from-[#D4AF37]/50 via-white/10 to-transparent hidden md:block" />
+              
+              {[
+                { label: "QUALITY CONTROL", value: "Factory Validation", desc: "Every timepiece undergoes rigorous movement regulation, water resistance testing, and microscopic aesthetic inspection before leaving the assembly facility." },
+                { label: "ROUTING", value: "Triangular Transit", desc: "Shipments are routed through low-risk European intermediate hubs to ensure absolute clearance and anonymity upon final delivery." },
+                { label: "DELIVERY", value: "10-20 Business Days", desc: "A calculated timeline designed strictly for security, ensuring your asset arrives without friction or retail exposure." }
+              ].map((stat, i) => (
+                <motion.div 
+                  key={i}
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 1.2, delay: i * 0.15, ease }}
+                  className="relative md:pl-12"
+                >
+                  <div className="absolute left-[-2px] top-1.5 w-3 h-3 bg-[#050505] border border-[#D4AF37] rounded-full hidden md:block" />
+                  <div className="text-[9px] uppercase tracking-[0.3em] text-[#D4AF37] mb-4">{stat.label}</div>
+                  <div className="text-2xl md:text-3xl text-white font-serif mb-4">{stat.value}</div>
+                  <div className="text-[#888] text-sm leading-relaxed font-light">{stat.desc}</div>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
-    </>
+    </main>
   );
 }

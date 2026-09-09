@@ -57,10 +57,11 @@ export default function LucyTimepieces() {
       {/* Hero Video Section */}
       <section className="relative w-full h-screen">
         <video 
-          autoPlay 
-          loop 
-          muted 
-          playsInline 
+          autoPlay={true}
+          loop={true}
+          muted={true}
+          playsInline={true}
+          referrerPolicy="no-referrer"
           className="absolute inset-0 w-full h-full object-cover"
         >
           <source src="https://lucytimepieces.com/wp-content/uploads/2025/06/lucytimepieces-com-1.mp4" type="video/mp4" />
@@ -145,10 +146,11 @@ export default function LucyTimepieces() {
               </div>
               <div className="relative w-full aspect-[9/16] bg-black">
                 <video 
-                  autoPlay 
-                  loop 
-                  muted 
-                  playsInline 
+                  autoPlay={true}
+                  loop={true}
+                  muted={true}
+                  playsInline={true}
+                  referrerPolicy="no-referrer"
                   className="absolute inset-0 w-full h-full object-cover"
                 >
                   <source src={social.src} type="video/mp4" />

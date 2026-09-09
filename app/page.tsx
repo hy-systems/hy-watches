@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
 const collection = [
@@ -39,45 +39,67 @@ const collection = [
 ];
 
 export default function LuxuryHomePage() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const { scrollY } = useScroll();
-  const heroOpacity = useTransform(scrollY, [0, 500], [1, 0]);
-  const heroY = useTransform(scrollY, [0, 500], [0, 100]);
-  const lineY = useTransform(scrollY, [0, 300], [0, 50]);
-  const lineOpacity = useTransform(scrollY, [0, 300], [1, 0]);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [isHovering, setIsHovering] = useState(false);
+  const containerRef = useRef(null);
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"]
+  });
+
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  const heroY = useTransform(scrollYProgress, [0, 0.5], [0, 100]);
 
   useEffect(() => {
-    const updateMousePosition = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
+    const updateMouse = (e: MouseEvent) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
     };
-    window.addEventListener("mousemove", updateMousePosition);
-    return () => window.removeEventListener("mousemove", updateMousePosition);
+    // Only bind mouse events on desktop devices
+    if (window.matchMedia("(pointer: fine)").matches) {
+      window.addEventListener("mousemove", updateMouse);
+    }
+    return () => window.removeEventListener("mousemove", updateMouse);
   }, []);
 
-  const ease = [0.76, 0, 0.24, 1];
+  const handleHoverStart = () => setIsHovering(true);
+  const handleHoverEnd = () => setIsHovering(false);
+
+  const cinematicEase = [0.25, 1, 0.5, 1];
 
   return (
-    <main className="bg-[#050505] min-h-screen text-white selection:bg-[#D4AF37] selection:text-black">
+    <main ref={containerRef} className="bg-[#050505] min-h-screen text-white selection:bg-[#D4AF37] selection:text-black overflow-x-hidden">
+      
+      {/* Hyper-Responsive Custom Cursor (Disabled on Mobile) */}
       <motion.div
-        className="fixed top-0 left-0 w-6 h-6 border border-[#D4AF37] rounded-full pointer-events-none z-[9999] mix-blend-difference"
-        animate={{ x: mousePosition.x - 12, y: mousePosition.y - 12 }}
-        transition={{ type: "spring", stiffness: 500, damping: 28, mass: 0.5 }}
+        className="hidden md:block fixed top-0 left-0 pointer-events-none z-[9999] mix-blend-difference rounded-full"
+        animate={{
+          x: mousePos.x - (isHovering ? 24 : 4),
+          y: mousePos.y - (isHovering ? 24 : 4),
+          width: isHovering ? 48 : 8,
+          height: isHovering ? 48 : 8,
+          borderWidth: isHovering ? 1 : 0,
+          borderColor: "#D4AF37",
+          backgroundColor: isHovering ? "transparent" : "#D4AF37",
+        }}
+        transition={{ type: "tween", ease: "circOut", duration: 0.1 }}
       />
 
-      <section className="relative min-h-[100dvh] flex flex-col items-center justify-center overflow-hidden pt-20">
+      {/* Cinematic Hero */}
+      <section className="relative h-[100dvh] min-h-[600px] w-full flex flex-col items-center justify-center">
         <motion.div 
           style={{ opacity: heroOpacity, y: heroY }}
-          className="z-10 flex flex-col items-center text-center px-6 w-full"
+          className="z-10 flex flex-col items-center text-center w-full px-5"
         >
           <motion.div
-            initial={{ opacity: 0, y: 60 }}
+            initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.8, ease }}
+            transition={{ duration: 1.5, ease: cinematicEase }}
           >
-            <h1 className="text-[clamp(3.5rem,10vw,8rem)] leading-[0.85] font-serif tracking-tight text-[#EAEAEA]">
+            <h1 className="text-[clamp(3rem,12vw,8rem)] leading-[0.9] font-serif tracking-tight text-[#EAEAEA]">
               Precision
             </h1>
-            <h1 className="text-[clamp(3.5rem,10vw,8rem)] leading-[0.85] font-serif tracking-tight text-[#D4AF37] italic mt-4 md:mt-2">
+            <h1 className="text-[clamp(3rem,12vw,8rem)] leading-[0.9] font-serif tracking-tight text-[#D4AF37] italic mt-1 md:mt-2">
               Uncompromised.
             </h1>
           </motion.div>
@@ -85,74 +107,85 @@ export default function LuxuryHomePage() {
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 2, delay: 0.5, ease }}
-            className="mt-12 max-w-md text-[#888] text-[0.85rem] leading-loose font-light tracking-wide uppercase"
+            transition={{ duration: 1.5, delay: 0.4, ease: cinematicEase }}
+            className="mt-8 max-w-lg text-[#888] text-[0.8rem] md:text-[0.85rem] leading-[1.7] font-light tracking-wide px-4 md:px-0"
           >
-            Anonymous settlement. Flawless execution. Access 1:1 factory builds without retail friction.
+            Engineered for those who know the difference. Anonymous settlement. Flawless execution. Access 1:1 factory builds without retail friction.
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 2, delay: 0.8, ease }}
-            className="mt-16 flex items-center gap-12"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.5, delay: 0.6, ease: cinematicEase }}
+            className="mt-12 flex gap-8 w-full md:w-auto px-5 md:px-0"
           >
-            <a href="https://wa.me/yourwhatsappnumber" className="group relative px-10 py-4 border border-[#D4AF37]/30 hover:border-[#D4AF37] transition-all duration-700 ease-out">
-              <span className="relative z-10 text-[0.65rem] uppercase tracking-[0.3em] font-medium text-[#D4AF37]">Secure Allocation</span>
-              <div className="absolute inset-0 bg-[#D4AF37] scale-y-0 origin-bottom group-hover:scale-y-100 transition-transform duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] z-0" />
-              <span className="absolute inset-0 z-20 flex items-center justify-center text-[0.65rem] uppercase tracking-[0.3em] font-medium text-black opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-100">Secure Allocation</span>
+            <a 
+              href="https://wa.me/yourwhatsappnumber" 
+              onMouseEnter={handleHoverStart}
+              onMouseLeave={handleHoverEnd}
+              className="relative w-full md:w-auto px-8 py-4 border border-[#D4AF37] md:border-[#D4AF37]/40 md:hover:border-[#D4AF37] overflow-hidden group transition-colors duration-700 flex justify-center items-center"
+            >
+              <span className="relative z-10 text-[0.65rem] uppercase tracking-[0.25em] text-[#D4AF37] md:group-hover:text-black transition-colors duration-700 delay-100">
+                Secure Allocation
+              </span>
+              <div className="absolute inset-0 bg-[#D4AF37] w-0 md:group-hover:w-full transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] z-0 hidden md:block" />
             </a>
           </motion.div>
         </motion.div>
 
+        {/* Scroll Indicator */}
         <motion.div 
-          style={{ opacity: lineOpacity, y: lineY }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 2, delay: 1.5 }}
           className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4"
         >
-          <span className="text-[9px] uppercase tracking-[0.4em] text-[#555] rotate-90 mb-6">Scroll</span>
-          <div className="w-[1px] h-16 bg-gradient-to-b from-[#D4AF37] to-transparent" />
+          <div className="w-[1px] h-12 bg-gradient-to-b from-[#D4AF37] to-transparent animate-pulse" />
         </motion.div>
       </section>
 
-      <section className="py-56 px-6 max-w-[1200px] mx-auto">
-        <div className="flex flex-col items-center text-center mb-40">
-          <span className="text-[#D4AF37] text-[9px] uppercase tracking-[0.4em] mb-8">The Collection</span>
-          <h2 className="text-[clamp(2rem,5vw,4rem)] text-white font-serif leading-tight">Mastery in replication.</h2>
+      {/* Horizontal Carousel Collection (Rolex Style - Touch Native) */}
+      <section className="py-24 md:py-32 bg-[#050505]">
+        <div className="px-5 md:px-20 mb-12 md:mb-16 flex justify-between items-end">
+          <h2 className="text-[clamp(2rem,6vw,4rem)] text-white font-serif leading-tight">The Collection.</h2>
+          <span className="text-[#D4AF37] text-[9px] md:text-[10px] uppercase tracking-[0.3em] font-mono mb-2">Swipe</span>
         </div>
 
-        <div className="flex flex-col gap-40 md:gap-56">
+        <div className="flex overflow-x-auto snap-x snap-mandatory hide-scrollbar gap-6 md:gap-10 px-5 md:px-20 pb-10">
           {collection.map((watch, i) => (
             <motion.div 
               key={watch.ref}
-              initial={{ opacity: 0, y: 100 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-150px" }}
-              transition={{ duration: 1.5, ease }}
-              className={`flex flex-col ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} items-center gap-16 md:gap-32`}
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.8, delay: i * 0.1, ease: cinematicEase }}
+              className="snap-center snap-always min-w-[85vw] md:min-w-[450px] flex flex-col group md:cursor-none"
+              onMouseEnter={handleHoverStart}
+              onMouseLeave={handleHoverEnd}
             >
-              <div className="w-full md:w-1/2 flex justify-center relative group">
-                <div className="absolute inset-0 bg-[#D4AF37]/0 group-hover:bg-[#D4AF37]/10 rounded-full blur-[100px] transition-colors duration-1000" />
-                <div className="w-64 h-64 md:w-96 md:h-96 border border-white/5 rounded-full flex items-center justify-center text-[#333] text-xs relative z-10 group-hover:scale-105 transition-transform duration-[1.5s] ease-out">
-                  [WATCH ASSET {watch.ref}]
+              <div className="w-full h-[350px] md:h-[550px] relative flex items-center justify-center bg-transparent mb-6 md:mb-8 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#111] opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-1000 z-0" />
+                <div className="relative z-10 w-full h-full border border-white/10 md:border-white/5 flex items-center justify-center text-xs text-[#333] md:group-hover:scale-[1.03] transition-transform duration-[1.5s] ease-[cubic-bezier(0.25,1,0.5,1)]">
+                  [TRANSPARENT WATCH ASSET]
                 </div>
               </div>
 
-              <div className="w-full md:w-1/2 flex flex-col items-start">
-                <div className="flex items-center gap-4 mb-8">
-                  <span className="w-8 h-[1px] bg-[#D4AF37]" />
-                  <span className="text-[9px] uppercase tracking-[0.4em] text-[#D4AF37]">REF. {watch.ref}</span>
+              <div className="flex flex-col items-start w-full">
+                <div className="flex items-center gap-3 mb-3 md:mb-4">
+                  <span className="w-6 h-[1px] bg-[#D4AF37]" />
+                  <span className="text-[8px] md:text-[9px] uppercase tracking-[0.3em] text-[#D4AF37] font-mono">REF. {watch.ref}</span>
                 </div>
-                <h4 className="text-[10px] uppercase tracking-[0.3em] text-[#888] mb-2">{watch.brand}</h4>
-                <h3 className="text-4xl md:text-5xl text-white font-serif mb-12">{watch.model}</h3>
+                <h4 className="text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-[#888] font-mono mb-1">{watch.brand}</h4>
+                <h3 className="text-2xl md:text-3xl text-white font-serif mb-6">{watch.model}</h3>
                 
-                <div className="grid grid-cols-1 gap-8 w-full border-t border-white/10 pt-8">
+                <div className="grid grid-cols-2 gap-4 w-full">
                   <div className="flex flex-col">
-                    <span className="text-[9px] uppercase tracking-[0.3em] text-[#555] mb-2">Movement</span>
-                    <span className="text-sm text-[#EAEAEA] font-light tracking-wide">{watch.movement}</span>
+                    <span className="text-[7px] md:text-[8px] uppercase tracking-[0.2em] text-[#555] font-mono mb-1">Movement</span>
+                    <span className="text-[10px] md:text-xs text-[#EAEAEA] font-mono tracking-wide">{watch.movement}</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[9px] uppercase tracking-[0.3em] text-[#555] mb-2">Architecture</span>
-                    <span className="text-sm text-[#EAEAEA] font-light tracking-wide">{watch.case}</span>
+                    <span className="text-[7px] md:text-[8px] uppercase tracking-[0.2em] text-[#555] font-mono mb-1">Case</span>
+                    <span className="text-[10px] md:text-xs text-[#EAEAEA] font-mono tracking-wide">{watch.case}</span>
                   </div>
                 </div>
               </div>
@@ -161,39 +194,41 @@ export default function LuxuryHomePage() {
         </div>
       </section>
 
-      <section className="py-40 bg-[#020202]">
-        <div className="max-w-[1200px] mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-start gap-20">
-            <div className="md:w-1/3 sticky top-40">
-              <span className="text-[#D4AF37] text-[9px] uppercase tracking-[0.4em] mb-6 block">Acquisition</span>
-              <h2 className="text-4xl md:text-5xl text-white font-serif leading-tight">
-                Secure logistics.
-              </h2>
-            </div>
-            
-            <div className="md:w-1/2 flex flex-col gap-24 relative">
-              <div className="absolute left-[3px] top-2 bottom-0 w-[1px] bg-gradient-to-b from-[#D4AF37]/50 via-white/10 to-transparent hidden md:block" />
-              
-              {[
-                { label: "QUALITY CONTROL", value: "Factory Validation", desc: "Every timepiece undergoes rigorous movement regulation, water resistance testing, and microscopic aesthetic inspection before leaving the assembly facility." },
-                { label: "ROUTING", value: "Triangular Transit", desc: "Shipments are routed through low-risk European intermediate hubs to ensure absolute clearance and anonymity upon final delivery." },
-                { label: "DELIVERY", value: "10-20 Business Days", desc: "A calculated timeline designed strictly for security, ensuring your asset arrives without friction or retail exposure." }
-              ].map((stat, i) => (
-                <motion.div 
-                  key={i}
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 1.2, delay: i * 0.15, ease }}
-                  className="relative md:pl-12"
-                >
-                  <div className="absolute left-[-2px] top-1.5 w-3 h-3 bg-[#050505] border border-[#D4AF37] rounded-full hidden md:block" />
-                  <div className="text-[9px] uppercase tracking-[0.3em] text-[#D4AF37] mb-4">{stat.label}</div>
-                  <div className="text-2xl md:text-3xl text-white font-serif mb-4">{stat.value}</div>
-                  <div className="text-[#888] text-sm leading-relaxed font-light">{stat.desc}</div>
-                </motion.div>
-              ))}
-            </div>
+      {/* Edge-to-Edge Typography Banner */}
+      <section className="py-24 md:py-40 bg-[#111] border-y border-white/5">
+        <div className="max-w-[1400px] mx-auto px-5 md:px-20 grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-20">
+          <div>
+            <h2 className="text-3xl md:text-5xl text-white font-serif leading-[1.1] mb-8">
+              Absolute security. <br/> Zero retail friction.
+            </h2>
+            <a 
+              href="/terms" 
+              onMouseEnter={handleHoverStart}
+              onMouseLeave={handleHoverEnd}
+              className="inline-flex items-center gap-4 text-[8px] md:text-[9px] uppercase tracking-[0.3em] text-[#D4AF37] group"
+            >
+              Read Operating Terms
+              <span className="transform md:group-hover:translate-x-2 transition-transform duration-500 ease-out">→</span>
+            </a>
+          </div>
+          
+          <div className="flex flex-col gap-10 md:gap-12">
+            {[
+              { title: "Sourcing", desc: "Every asset is individually sourced, validated for weight and dimension, and photographically verified before you authorize dispatch." },
+              { title: "Logistics", desc: "We utilize established European routing corridors to bypass regional scrutiny. 10 to 20 business days to clear and deliver." }
+            ].map((item, i) => (
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 1, delay: i * 0.2, ease: cinematicEase }}
+                className="flex flex-col"
+              >
+                <div className="text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-mono text-[#EAEAEA] mb-2 md:mb-3">{item.title}</div>
+                <div className="text-[#888] text-[0.8rem] md:text-[0.85rem] leading-[1.7] font-light">{item.desc}</div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>

@@ -61,7 +61,7 @@ export default function LucyTimepieces() {
           loop={true}
           muted={true}
           playsInline={true}
-          referrerPolicy="no-referrer"
+          crossOrigin="anonymous"
           className="absolute inset-0 w-full h-full object-cover"
         >
           <source src="https://lucytimepieces.com/wp-content/uploads/2025/06/lucytimepieces-com-1.mp4" type="video/mp4" />
@@ -150,7 +150,7 @@ export default function LucyTimepieces() {
                   loop={true}
                   muted={true}
                   playsInline={true}
-                  referrerPolicy="no-referrer"
+                  crossOrigin="anonymous"
                   className="absolute inset-0 w-full h-full object-cover"
                 >
                   <source src={social.src} type="video/mp4" />
